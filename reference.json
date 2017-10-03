@@ -1,5 +1,5 @@
 {
-	"mainnet?":"The mainnet launch window was moved from September to October a while back. That's what the testnet is for - to help accelerate or decelerate the launch of main net, as is appropriate. wouldn't want to launch with a bunch of bugs now",
+	"mainnet?":"QRL's mainnet launch window has always been dependent on 3 things: Not rushing out a product before it is ready, internal testing, and external auditing. The timeline has and will continue to be advanced based on those metrics",
 	"news":"Lots of new hires, qrllib/core is being packaged and speedified. We're so close to the security testing stages I can taste it",
 	"testnet":"\nGuide to started with testnet: <https://github.com/theQRL/QRL/> \nWeb-wallet: http://localhost:8888/ \nQRL Explorer: http://qrlexplorer.info/ \nFaucet <http://qrl-faucet.folio.ninja/>",
 	"team":"- @Founder (@peterwaterland#7473) \n- @Developer (@scottdonald, @Cyyber#7272, @bish, @leongb, @random_user_generator#1260 , @jp#7286, @Burke#3967, @coda, @aidan#9216, @purpletentacle#8044)\n- @Moderator (@jackalyst#2862, @Elliottdehn#3504, @Puck342#3354)",

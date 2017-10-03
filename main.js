@@ -3,9 +3,6 @@ const request = require('request');
 const rp = require('request-promise');
 const moment = require('moment');
 const puppeteer = require('puppeteer');
-
-
-
 const client = new Discord.Client();
 
 
