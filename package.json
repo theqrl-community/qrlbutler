@@ -1,0 +1,19 @@
+{
+  "name": "qrlbutler",
+  "version": "0.0.2",
+  "description": "Discord Helper Bot for QRL",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^11.2.1",
+    "fs": "0.0.1-security",
+    "moment": "^2.18.1",
+    "puppeteer": "^0.11.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  }
+}
