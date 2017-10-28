@@ -5,16 +5,18 @@ const moment = require('moment');
 const puppeteer = require('puppeteer');
 const client = new Discord.Client();
 
+if(!process.argv[2]) {
+    console.log("Declare your environment!");
+    return;
+}
 
-var config = require('../env.json')['production'];
+var config = require('../env.json')[process.argv[2]];
 const ref = require("./reference.json");
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 const token = config['token'];
 const commands = ['ref','tn', 'tx', 'help', 'cmc', 'bittrex'];
 const cmc_ticker = require('./cmc_ticker.json'); // Pull occassionally from https://api.coinmarketcap.com/v1/ticker/
-
-
 
 async function cmc_screenshot(ticker_id, message) {
 	var filename = "widget-"+ticker_id+".png";
@@ -97,11 +99,11 @@ async function bittrex_chart(market, message) {
 
 
 client.on('ready', () => {
-        console.log("Ready ready!");
+    
         setInterval(function() {
                  const apibtcqrl = 'https://bittrex.com/api/v1.1/public/getmarketsummary?market=btc-qrl';
                 const apiusdtbtc = 'https://bittrex.com/api/v1.1/public/getmarketsummary?market=usdt-btc';
-
+                
                 var btcqrl;
                 rp({uri:apibtcqrl,json:true})
                         .then(function(body) {
@@ -158,6 +160,8 @@ client.on('message', message => {
             message.channel.send(commands.join("\n"));
             return;
         }
+
+        return;
 
         if(cmd=="bittrex") {
             bittrex_chart(subcommand, message);
