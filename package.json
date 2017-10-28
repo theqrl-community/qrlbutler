@@ -9,11 +9,17 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bufferutil": "^3.0.2",
     "discord.js": "^11.2.1",
+    "erlpack": "github:hammerandchisel/erlpack",
     "fs": "0.0.1-security",
+    "libsodium-wrappers": "^0.5.4",
     "moment": "^2.18.1",
+    "node-opus": "^0.2.7",
+    "opusscript": "0.0.3",
     "puppeteer": "^0.11.0",
     "request": "^2.83.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "uws": "^0.14.5"
   }
 }
