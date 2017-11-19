@@ -58,6 +58,7 @@ Remember to use a development/test server
 Get on the latest version of node (v8+), for development I suggest [Node Version Manage](https://github.com/creationix/nvm#install-script)
 
 ```
+cd core/
 npm install
 ``` 
 
@@ -68,3 +69,10 @@ Be sure to include  your environment!
 ```
 node main.js production
 ```
+
+
+# Customise!
+
+Make it your own. Right now all modules are built in the 'messages' event listener, so it reads the previous message and responds to it. This will be expanded for more flexibility.
+
+You can look inside of functions.js for some examples
