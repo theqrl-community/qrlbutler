@@ -46,7 +46,6 @@ console.log(commands);
 // The action starts here!
 client.on('ready', () => {
     console.log("Ready to serve");
-    console.log("Token Symbol: "+config['config']['token_symbol']);
     modprice.setprice(client,'btc-qrl');    
 
     setInterval(function() {

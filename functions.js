@@ -1,4 +1,5 @@
 const download = require('./core/node_modules/download');
+const fs = require('fs');
 
 module.exports = {
   echo: {
@@ -10,13 +11,15 @@ module.exports = {
     channel: 'bot',
     preload: function() {
 		var url = 'http://api.coinmarketcap.com/v1/ticker/?limit=1000';
-		download(url, 'data').then(() => {});
+  		download(url).then((data) => {
+        fs.writeFileSync('data/cmc.json', data);
+      });
     },
     config: {
       url: 'https://coinmarketcap.com/currencies/{tickerurl}/#tools',
       css: '.col-md-4 .coinmarketcap-currency-widget',
       preprocess: function(subcommand) {
-        var cmc_ticker = require('./data/ticker');
+        var cmc_ticker = require('./data/cmc.json');
         var chk_symbol=subcommand.toUpperCase();
         var chk_id=subcommand.toLowerCase();
 
