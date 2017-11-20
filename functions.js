@@ -16,18 +16,17 @@ module.exports = {
       url: 'https://coinmarketcap.com/currencies/{tickerurl}/#tools',
       css: '.col-md-4 .coinmarketcap-currency-widget',
       preprocess: function(subcommand) {
-  		    var cmc_ticker = require('./data/ticker.json');
-            var chk_symbol=subcommand.toUpperCase();
-            var chk_id=subcommand.toLowerCase();
+        var cmc_ticker = require('./data/ticker');
+        var chk_symbol=subcommand.toUpperCase();
+        var chk_id=subcommand.toLowerCase();
 
-            // Check against ticker. Moonwalk
-            for (var i = cmc_ticker.length - 1; i >= 0; i--) {
-                if(cmc_ticker[i]['symbol']==chk_symbol || cmc_ticker[i]['id']==chk_id) {
-                    console.log("Getting page: "+cmc_ticker[i]['id'])
-                    return cmc_ticker[i]['id'];
-                    
-                }
+        // Check against ticker. Moonwalk
+        for (var i = cmc_ticker.length - 1; i >= 0; i--) {
+            if(cmc_ticker[i]['symbol']==chk_symbol || cmc_ticker[i]['id']==chk_id) {
+              console.log("Getting page: "+cmc_ticker[i]['id'])
+              return cmc_ticker[i]['id'];                
             }
+        }
       }
     }
   },
