@@ -1,6 +1,6 @@
 core/node_modules
 node_modules
-package-logk.json
+package-lock.json
 data
 env.json
-screenshot*
+screenshot-*

@@ -20,7 +20,7 @@
     "moment": "^2.18.1",
     "node-opus": "^0.2.7",
     "opusscript": "0.0.3",
-    "puppeteer": "^0.11.0",
+    "puppeteer": "^0.13.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "uws": "^0.14.5"
