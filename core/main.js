@@ -4,20 +4,19 @@ const client = new Discord.Client();
 
 const fs = require('fs');
 const download = require('download');
+
 // Load /all/ the modules.
 const modping = require('./modules/ping.js');
 const modprice = require('./modules/price.js');
 const modscreenshot = require('./modules/screenshot.js');
 
 
+
 const modules = {
     echo:function(message, subcommand, config) { modping.echo(message, subcommand, config) },
-    screenshot:function(message, subcommand, config) { modscreenshot.screenshot(message, subcommand, config); }
-}
+    screenshot:function(message, subcommand, config) { modscreenshot.screenshot(message, subcommand, config); },
+};
  
-
-
-
 // Check for environment declaration
 if(!process.argv[2]) {
     console.log("Declare your environment!\nnode core/main.js [environment]");
@@ -41,11 +40,12 @@ for(key in functions) {
         functions[key].preload();
     }
 }
-console.log(commands);
+console.log("Commands are: "+commands);
 
 // The action starts here!
 client.on('ready', () => {
     console.log("Ready to serve");
+
     modprice.setprice(client,'btc-qrl');    
 
     setInterval(function() {
@@ -58,7 +58,7 @@ client.on('message', message => {
     if(message.author.bot) return;
 
     // Check if command is hit to avoid needless extra work.
-    if(!new RegExp("^("+commands.join("|")+")",'i').test(message.content)) {
+    if(!new RegExp("^("+commands.join("|")+") ",'i').test(message.content)) {
         return;
     }
 
@@ -66,10 +66,10 @@ client.on('message', message => {
     const cmd = message.content.toLowerCase().split(' ')[0];
 
     // Change to subtext!
-    const subcommand = message.content.split(' ')[1] || undefined;
+    const subcommand = message.content.substr(message.content.indexOf(" ") + 1) || undefined;
 
     // Don't filter cmd, just subcommand
-    if(!/^[a-zA-Z0-9-]+$/.test(subcommand)) {
+    if(!/^[a-zA-Z0-9- ]+$/.test(subcommand)) {
         message.channel.send("Sorry, that's not a good subcommand");
         return;
     }
@@ -81,7 +81,7 @@ client.on('message', message => {
     if(functions[cmd]["channel"]) {
         if(functions[cmd]["channel"]!=message.channel.name) {
             message.channel.send("Sorry, this function is only allowed in the "+functions[cmd]["channel"]+" channel");
-            message.channel.stopTyping();            
+            message.channel.stopTyping();
             return;
         }
     }

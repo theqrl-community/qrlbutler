@@ -28,7 +28,7 @@ module.exports = {
             .then(function(body) {
                     var value=+(body.result[0].Last * btcqrl).toFixed(2);
                     var sat=btcqrl*100000;
-                    client.user.setGame("$"+value.toFixed(2)+" | "+sat.toFixed(1)+"k Sat");
+                    client.user.setActivity("$"+value.toFixed(2)+" | "+sat.toFixed(1)+"k Sat");
             });
     }
 }
