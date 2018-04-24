@@ -2,15 +2,11 @@ const download = require('./core/node_modules/download');
 const fs = require('fs');
 
 module.exports = {
-  echo: {
-    module: 'echo',
-    channel: 'general'
-  },
   cmc: {
     module: 'screenshot',
-    channel: 'bot',
+    channel: 'butler',
     preload: function() {
-		var url = 'http://api.coinmarketcap.com/v1/ticker/?limit=1000';
+		var url = 'http://api.coinmarketcap.com/v1/ticker/?limit=1200';
   		download(url).then((data) => {
         fs.writeFileSync('data/cmc.json', data);
       });
@@ -18,27 +14,50 @@ module.exports = {
     config: {
       url: 'https://coinmarketcap.com/currencies/{tickerurl}/#tools',
       css: '.col-md-4 .coinmarketcap-currency-widget',
-      preprocess: function(subcommand) {
+      preprocess: function(message, subcommand) {
         var cmc_ticker = require('./data/cmc.json');
-        var chk_symbol=subcommand.toUpperCase();
-        var chk_id=subcommand.toLowerCase();
+        var chk_symbol=subcommand.toUpperCase().split(' ');
+        var chk_id=subcommand.toLowerCase().split(' ');
+        var ticker=[];
+        var max=5;
+        var count=0;
 
-        // Check against ticker. Moonwalk
-        for (var i = cmc_ticker.length - 1; i >= 0; i--) {
-            if(cmc_ticker[i]['symbol']==chk_symbol || cmc_ticker[i]['id']==chk_id) {
-              console.log("Getting page: "+cmc_ticker[i]['id'])
-              return cmc_ticker[i]['id'];                
-            }
+        for (var b = 0; b < chk_id.length; b++) {
+
+          // Check against ticker. Moonwalk
+          for (var i = 0; i < cmc_ticker.length; i++) {
+              if(cmc_ticker[i]['symbol']==chk_symbol[b] || cmc_ticker[i]['id']==chk_id[b]) {
+                count++; 
+                if(count>max) {
+                  break;
+                }
+                console.log("Getting page: "+cmc_ticker[i]['id'])
+
+                ticker.push({
+                  url:'https://coinmarketcap.com/currencies/'+cmc_ticker[i]['id']+'/#tools',
+                  filename:'screenshot.'+cmc_ticker[i]['id']+'.png'
+                });
+      
+                break;
+              }
+          }
+          if(count>max) {
+            message.channel.send("There's only "+max+" screenshots allowed at a time, gathering the first "+max+" screenshots"); 
+            break;
+          }
+          
         }
-      }
-    }
-  },
-  ref:{
-    module:'echo',
-    config:{
-      reference:{
-        "testnet":"\nGuide to started with testnet: <https://github.com/theQRL/QRL/> \nWeb-wallet: https://wallet.qrlexplorer.info/ \nQRL Explorer: http://qrlexplorer.info/ \nFaucet <http://qrl-faucet.folio.ninja/>",
-        "team":"- @Founder (@peterwaterland#7473) \n- @Developer (@scottdonald, @Cyyber#7272, @bish, @leongb, @random_user_generator#1260 , @jp#7286, @Burke#3967, @coda, @aidan#9216, @purpletentacle#8044)\n- @Moderator (@jackalyst#2862, @Elliottdehn#3504, @Puck342#3354)"
+
+        // console.log(ticker);
+        if(ticker.length===0) {
+          return [{
+            error:true,
+            error_msg:"Couldn not find a currency named "+subcommand
+          }]
+        } else {
+          return ticker;
+        }
+
       }
     }
   }

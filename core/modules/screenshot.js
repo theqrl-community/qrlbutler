@@ -1,87 +1,76 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-String.prototype.printf = String.prototype.printf || function () {
-    "use strict";
-    var str = this.toString();
-    if (arguments.length) {
-        var t = typeof arguments[0];
-        var key;
-        var args = ("string" === t || "number" === t) ?
-            Array.prototype.slice.call(arguments)
-            : arguments[0];
-
-        for (key in args) {
-            str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
-        }
-    }
-
-    return str;
-};
-
 module.exports = {
 	screenshot:async function(message, subcommand, config) {
+		var filename = '';
+		var url = '';
+
+		// Preprocess generates the final URL 
 		if(config.preprocess) {
-			var ticker=config.preprocess(subcommand);
+			var preparam = config.preprocess(message, subcommand);
 		}
-		if(!subcommand) {
-			var filename = "screenshot.png";
-		} else {
-			var filename = "screenshot-"+ticker+".png";
-		}
+		console.log(preparam);
+		
+		// If parameter throws error. Return what it was.
+		if(preparam[0].error===true) {
+			message.channel.send(preparam[0].error_msg);
+			message.channel.stopTyping();
+			return;
+		} 
+
+		const browser = await puppeteer.launch({
+		    ignoreHTTPSErrors: false
+		});
+		const page = await browser.newPage();
 
 
-		try {
-			const browser = await puppeteer.launch({
-			    ignoreHTTPSErrors: true
-			});
-			const page = await browser.newPage();
-			const response = await page.goto(config.url.printf({
-				tickerurl:ticker
-			}),{
-				waitUntil: 'networkidle'
-    		});			
+		for (var i =0; i < preparam.length; i++) {
+			url = preparam[i].url;
+			filename =  preparam[i].filename;
 
-			if(!response.ok) {
-				message.channel.send("Sorry, couldn't gather that screenshot");
-				await browser.close();
-				return;
+			try {
+				const response = await page.goto(url,{
+					waitUntil: 'networkidle2'
+	    		});			
+
+				if(!response.ok) {
+					message.channel.send("Sorry, couldn't gather that screenshot");
+					// await page.close();
+					return;
+				}
+
+				await page.setViewport({
+					width: 1080, height: 1500
+				});
+
+				const rect = await page.evaluate(selector => {
+					const element = document.querySelector(selector);
+					const { x, y, width, height } = element.getBoundingClientRect();
+					return { left: x, top: y, width, height, id: element.id };
+				}, config.css);		
+
+
+				await page.screenshot({
+					path: filename,
+					clip: {
+					  x: rect.left,
+					  y: rect.top,
+					  width: rect.width,
+					  height: rect.height
+					}
+				});	
+
+			} catch(error) {
+				console.log("ERROR:", error);
 			}
 
-			await page.setViewport({
-				width: 1080,
-				height: 2000
-			});
+			message.channel.send("", { 
+				file:filename 
+			}).then((err) => fs.unlink(filename, (error) => {} )).catch(console.error);
 
-			const rect = await page.evaluate(selector => {
-				const element = document.querySelector(selector);
-				const { x, y, width, height } = element.getBoundingClientRect();
-				return { left: x, top: y, width, height, id: element.id };
-			}, config.css);		
-
-
-			await page.screenshot({
-				path: filename,
-				clip: {
-				  x: rect.left,
-				  y: rect.top,
-				  width: rect.width,
-				  height: rect.height
-				}
-			});
-
-			await browser.close();
-		} catch(error) {
-			console.log("ERROR:", error);
 		}
 
-		message.channel.send("", { 
-			file:filename 
-		})
-		.then((err) => fs.unlink(filename)
-		)
-		.catch(console.error);
-
-
+		await browser.close();
 	}
 }
