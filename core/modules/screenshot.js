@@ -41,7 +41,7 @@ module.exports = {
 				}
 
 				await page.setViewport({
-					width: 1080, height: 1500
+					width: 1200, height: 2500
 				});
 
 				const rect = await page.evaluate(selector => {
@@ -65,7 +65,7 @@ module.exports = {
 				console.log("ERROR:", error);
 			}
 
-			message.channel.send("", { 
+			message.channel.send("<"+preparam[i].url+">", { 
 				file:filename 
 			}).then((err) => fs.unlink(filename, (error) => {} )).catch(console.error);
 

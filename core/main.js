@@ -15,6 +15,7 @@ const modscreenshot = require('./modules/screenshot.js');
 const modules = {
     echo:function(message, subcommand, config) { modping.echo(message, subcommand, config) },
     screenshot:function(message, subcommand, config) { modscreenshot.screenshot(message, subcommand, config); },
+    pricing:function(message, subcommand, config) { modpricing.pricing(message, subcommand, config); },
 };
  
 // Check for environment declaration
@@ -80,7 +81,7 @@ client.on('message', message => {
     // Check if it's the right channel
     if(functions[cmd]["channel"]) {
         if(functions[cmd]["channel"]!=message.channel.name) {
-            message.channel.send("Sorry, this function is only allowed in the "+functions[cmd]["channel"]+" channel");
+            // message.channel.send("Sorry, this function is only allowed in the "+functions[cmd]["channel"]+" channel");
             message.channel.stopTyping();
             return;
         }
