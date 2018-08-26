@@ -194,18 +194,21 @@ module.exports = {
 			var wts = db.getData("/wts");
 			var wts_sorted = wts.sort(sort_by('btc',true, parseFloat));
 
-			output += "Market WTS```";		
-			wts_sorted.forEach(function(arr) {
-				qrl = parseFloat(arr['qrl']);
-				btc = parseFloat(arr['btc']);
-				order = String(arr['orderid']);
-				total= btc * qrl;
-				output += order.padStart(3," ")+" ";
-				output += btc.toFixed(8)+' btc/qrl';
-				output += String(arr.qrl).padStart(6," ")+" qrl ";
-				output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
-			});
-			output += "```";
+			if(wts.length>0) {
+
+				output += "Market WTS (want to sell)```";		
+				wts_sorted.forEach(function(arr) {
+					qrl = parseFloat(arr['qrl']);
+					btc = parseFloat(arr['btc']);
+					order = String(arr['orderid']);
+					total= btc * qrl;
+					output += order.padStart(3," ")+" ";
+					output += btc.toFixed(8)+' btc/qrl';
+					output += String(arr.qrl).padStart(6," ")+" qrl ";
+					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
+				});
+				output += "```";
+			}
 		} catch(error) {
 
 		}
@@ -213,21 +216,21 @@ module.exports = {
 		try {
 			var wtb = db.getData("/wtb");
 			var wtb_sorted = wtb.sort(sort_by('btc',true, parseFloat));
-			console.log(wtb);
-			console.log(wtb_sorted);
 
-			output += "Market WTB```";
-			wtb_sorted.forEach(function(arr) {
-				qrl = parseFloat(arr.qrl);
-				btc = parseFloat(arr.btc);
-				order = String(arr.orderid);
-				total= btc * qrl;
-				output += order.padStart(3," ")+" ";
-				output += btc.toFixed(8)+' btc/qrl';
-				output += String(arr.qrl).padStart(6," ")+" qrl ";
-				output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
-			});
-			output += "```";
+			if(wtb.length>0) {
+				output += "Market WTB (want to buy)```";
+				wtb_sorted.forEach(function(arr) {
+					qrl = parseFloat(arr.qrl);
+					btc = parseFloat(arr.btc);
+					order = String(arr.orderid);
+					total= btc * qrl;
+					output += order.padStart(3," ")+" ";
+					output += btc.toFixed(8)+' btc/qrl';
+					output += String(arr.qrl).padStart(6," ")+" qrl ";
+					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
+				});
+				output += "```";
+			}
 		} catch(error) {
 
 		}
