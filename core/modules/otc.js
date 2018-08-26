@@ -200,7 +200,10 @@ module.exports = {
 				btc = parseFloat(arr['btc']);
 				order = String(arr['orderid']);
 				total= btc * qrl;
-				output += order.padStart(3," ")+" "+btc.toFixed(8)+" btc/qrl "+arr["qrl"].padStart(6," ")+" qrl "+String(total.toFixed(8)).padStart(12," ")+" BTC "+arr["username"]+"\n";
+				output += order.padStart(3," ")+" ";
+				output += btc.toFixed(8)+' btc/qrl';
+				output += String(arr.qrl).padStart(6," ")+" qrl ";
+				output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
 			});
 			output += "```";
 		} catch(error) {
@@ -210,14 +213,19 @@ module.exports = {
 		try {
 			var wtb = db.getData("/wtb");
 			var wtb_sorted = wtb.sort(sort_by('btc',true, parseFloat));
+			console.log(wtb);
+			console.log(wtb_sorted);
 
 			output += "Market WTB```";
 			wtb_sorted.forEach(function(arr) {
-				qrl = parseFloat(arr['qrl']);
-				btc = parseFloat(arr['btc']);
-				order = String(arr['orderid']);
+				qrl = parseFloat(arr.qrl);
+				btc = parseFloat(arr.btc);
+				order = String(arr.orderid);
 				total= btc * qrl;
-				output += order.padStart(3," ")+" "+btc.toFixed(8)+" btc/qrl "+arr["qrl"].padStart(6," ")+" qrl "+String(total.toFixed(8)).padStart(12," ")+" BTC "+arr["username"]+"\n";
+				output += order.padStart(3," ")+" ";
+				output += btc.toFixed(8)+' btc/qrl';
+				output += String(arr.qrl).padStart(6," ")+" qrl ";
+				output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
 			});
 			output += "```";
 		} catch(error) {
