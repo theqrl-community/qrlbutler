@@ -51,7 +51,7 @@ var cgref = {
         if(ticker.length===0) {
           return [{
             error:true,
-            error_msg:"Couldn not find a currency named "+subcommand
+            error_msg:"Sorry, I could not find a cryptocurrency project named "+subcommand
           }]
         } else {
           return ticker;
@@ -115,7 +115,7 @@ module.exports = {
         if(ticker.length===0) {
           return [{
             error:true,
-            error_msg:"Couldn not find a currency named "+subcommand
+            error_msg:"Sorry, I could not find a cryptocurrency project named "+subcommand
           }]
         } else {
           return ticker;
@@ -123,5 +123,9 @@ module.exports = {
 
       }
     }
+  },
+  otc: {
+    module: 'otc',
+    channel: 'otc'
   }
 }

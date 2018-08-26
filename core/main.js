@@ -9,13 +9,16 @@ const download = require('download');
 const modping = require('./modules/ping.js');
 const modprice = require('./modules/price.js');
 const modscreenshot = require('./modules/screenshot.js');
+const modotc = require('./modules/otc.js');
 
-
+console.log("Loaded modules");
 
 const modules = {
     echo:function(message, subcommand, config) { modping.echo(message, subcommand, config) },
     screenshot:function(message, subcommand, config) { modscreenshot.screenshot(message, subcommand, config); },
     pricing:function(message, subcommand, config) { modpricing.pricing(message, subcommand, config); },
+    otc:function(message, subcommand, config) { modotc.otc(message, subcommand, config); },
+
 };
  
 // Check for environment declaration
@@ -23,6 +26,7 @@ if(!process.argv[2]) {
     console.log("Declare your environment!\nnode core/main.js [environment]");
     return;
 }
+console.log("Declared environment variables");
 
 var config = require('../env.json')[process.argv[2]];
 const token = config['token'];
@@ -51,15 +55,18 @@ client.on('ready', () => {
 
     setInterval(function() {
         modprice.setprice(client,'btc-qrl');    
-    }, 60 * 1000);
+    }, 120 * 1000);
 });
 
 client.on('message', message => {
+    console.log("Executing message: "+message.content);
+
+
     // Don't respond to other bots.
     if(message.author.bot) return;
 
     // Check if command is hit to avoid needless extra work.
-    if(!new RegExp("^("+commands.join("|")+") ",'i').test(message.content)) {
+    if(!new RegExp("^("+commands.join("|")+")",'i').test(message.content)) {
         return;
     }
 
@@ -69,26 +76,22 @@ client.on('message', message => {
     // Change to subtext!
     const subcommand = message.content.substr(message.content.indexOf(" ") + 1) || undefined;
 
-    // Don't filter cmd, just subcommand
-    if(!/^[a-zA-Z0-9- ]+$/.test(subcommand)) {
-        message.channel.send("Sorry, that's not a good subcommand");
-        return;
-    }
-
-    message.channel.startTyping();
     var command = functions[cmd]['module'];
 
     // Check if it's the right channel
     if(functions[cmd]["channel"]) {
         if(functions[cmd]["channel"]!=message.channel.name) {
-            // message.channel.send("Sorry, this function is only allowed in the "+functions[cmd]["channel"]+" channel");
-            message.channel.stopTyping();
             return;
         }
     }
-    modules[command](message, subcommand, functions[cmd]['config']);
-    message.channel.stopTyping();
 
+    // Don't filter cmd, just subcommand
+    if(!/^[a-zA-Z0-9-\. ]+$/.test(subcommand)) {
+        message.channel.send("Sorry, that's not a good subcommand");
+        return;
+    }
+
+    modules[command](message, subcommand, functions[cmd]['config']);
 });
 
 client.login(token);

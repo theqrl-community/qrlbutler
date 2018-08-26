@@ -3,9 +3,10 @@ const fs = require('fs');
 
 module.exports = {
 	screenshot:async function(message, subcommand, config) {
+		console.log("Executing screenshot module");
 		var filename = '';
 		var url = '';
-
+		var page ='';
 		// Preprocess generates the final URL 
 		if(config.preprocess) {
 			var preparam = config.preprocess(message, subcommand);
@@ -18,12 +19,12 @@ module.exports = {
 			message.channel.stopTyping();
 			return;
 		} 
-
-		const browser = await puppeteer.launch({
-		    ignoreHTTPSErrors: false
-		});
-		const page = await browser.newPage();
-
+		try {
+			const browser = await puppeteer.launch({
+		    		ignoreHTTPSErrors: false,
+				args:['--no-sandbox','--disable-setuid-sandbox'],
+			});
+ 			const page = await browser.newPage();
 
 		for (var i =0; i < preparam.length; i++) {
 			url = preparam[i].url;
@@ -72,5 +73,9 @@ module.exports = {
 		}
 
 		await browser.close();
+	
+                } catch (error) {
+                        console.log("Puppeteer failed to launch"+error);
+                }
 	}
 }
