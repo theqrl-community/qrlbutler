@@ -44,7 +44,7 @@ module.exports = {
 		// Check if WTB is lower than WTS
 		try {
 			var wtb = db.getData("/wtb");
-			var wtb_sorted = wtb.sort(sort_by('btc',false, parseFloat));
+			var wtb_sorted = wtb.sort(sort_by('btc',true, parseFloat));
 
 			if(wtb_sorted[0]['btc'] > btc - 0.00000001) {
 				message.channel.send("Sorry, the WTS order must be higher than the *highest* WTB order at this time");
@@ -240,6 +240,18 @@ module.exports = {
 		}
 		message.channel.send(output);
 	},
+	escrow: function(message, command) {
+		// If no command, print 'help'
+
+		// otc escrow list
+
+		// otc escrow order [btc_full] [qrl_full] [party_btc] [party_qrl]
+		// ^ put in new escrow order
+
+		// otc escrow recieved [order_number]
+		// otc escrow review [order_number]
+		// otc escrow status [order_number]
+	},
 	otc:async function(message, subcommand, config) {
 		var	command = subcommand.toLowerCase().split(' ');
 
@@ -256,11 +268,15 @@ module.exports = {
 			case 'clear':
 				this.clear(message, command);
 			break;
+			case 'escrow':
+				this.escrow(message, command);
+			break;
 			case 'clearall':
 				this.clearall(message, command);
 			break;
 			default:
-				message.channel.send("otc [wts/wtb] [btc] [quantity]");
+				message.channel.send("**Look at the market**\n`otc market`\n\n**Set a WTS (Want to Sell) order**\n`otc wts [btc/qrl] [qrl]`\n\n**Set a WTB (Want to Buy) order**\n`otc wtb [btc/qrl] [qrl]`\n\n**Remove an order**\n`otc clear [order number]`")
+
 		}
 
 	}
