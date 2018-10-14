@@ -15,6 +15,45 @@ var sort_by = function(field, reverse, primer){
 }
 
 module.exports = {
+	cleanup:function(message) {
+		try {
+			var wtb = db.getData("/wtb");
+			var wtb_arr = [];
+
+			wtb.forEach(function(arr) {
+
+				if(message.guild.members.get(arr['userid'])) {
+					wtb_arr.push(arr);
+				} else {
+					message.channel.send("User "+arr['username']+" doesn't exist on this server anymore so removing orderid# "+arr['orderid']);
+				}
+	 
+
+			});
+			db.push("/wtb", wtb_arr);
+		} catch(e) {
+
+		};
+
+		try {
+			var wts = db.getData("/wts");
+			var wts_arr = [];
+
+			wts.forEach(function(arr) {
+
+				if(message.guild.members.get(arr['userid'])) {
+					wts_arr.push(arr);
+				} else {
+					message.channel.send("User "+arr['username']+" doesn't exist on this server anymore so removing order id# "+arr['orderid']);
+				}
+				
+	 
+			});
+			db.push("/wts", wts_arr);
+		} catch(e) {
+
+		};
+	},
 	wts:function(message, command) {
 		var btc = command[1];
 		var qrl = command[2];
@@ -253,6 +292,7 @@ module.exports = {
 		// otc escrow status [order_number]
 	},
 	otc:async function(message, subcommand, config) {
+		this.cleanup(message);
 		var	command = subcommand.toLowerCase().split(' ');
 
 		switch(command[0]) {
