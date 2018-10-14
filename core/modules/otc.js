@@ -14,6 +14,41 @@ var sort_by = function(field, reverse, primer){
      } 
 }
 
+function timeDifference(current, previous) {
+
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+    var msPerMonth = msPerDay * 30;
+    var msPerYear = msPerDay * 365;
+
+    var elapsed = current - previous;
+
+    if (elapsed < msPerMinute) {
+         return Math.round(elapsed/1000) + ' seconds ago';   
+    }
+
+    else if (elapsed < msPerHour) {
+         return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+    }
+
+    else if (elapsed < msPerDay ) {
+         return Math.round(elapsed/msPerHour ) + ' hours ago';   
+    }
+
+    else if (elapsed < msPerMonth) {
+        return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
+    }
+
+    else if (elapsed < msPerYear) {
+        return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';   
+    }
+
+    else {
+        return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
+    }
+}
+
 module.exports = {
 	cleanup:function(message) {
 		try {
@@ -53,6 +88,55 @@ module.exports = {
 		} catch(e) {
 
 		};
+
+
+		var currenttime = Date.now();
+
+		try {
+			var wts = db.getData("/wts");
+			var wts_arr = [];
+			var updatedb = false;
+
+			wts.forEach(function(arr) {
+				if(arr['datenow']) {
+					// Get seconds
+					// secondsPast = (now.getTime() - arr.getTime()) / 1000;
+				} else {
+					arr['datenow'] = Date.now();
+										updatedb = true;
+
+				}
+				wts_arr.push(arr);
+			});
+			if(updatedb===true) {
+				db.push("/wts",wts_arr);
+			}
+
+		} catch(e) {
+
+		}
+
+		try {
+			var wtb = db.getData("/wtb");
+			var wtb_arr = [];
+			var updatedb = false;
+
+			wtb.forEach(function(arr) {
+				if(arr['datenow']) {
+
+				} else {
+					arr['datenow'] = Date.now();
+					updatedb = true;
+				}
+				wtb_arr.push(arr);
+			});
+			if(updatedb===true) {
+				db.push("/wtb",wtb_arr);				
+			}
+
+		} catch(e) {
+
+		}
 	},
 	wts:function(message, command) {
 		var btc = command[1];
@@ -104,7 +188,8 @@ module.exports = {
 			"btc":btc,
 			"qrl":qrl,
 			"username":message.author.username,
-			"userid":message.author.id
+			"userid":message.author.id,
+			"datenow":Date.now()
 		}, true);
 
 		this.market(message);
@@ -161,7 +246,8 @@ module.exports = {
 			"btc":btc,
 			"qrl":qrl,
 			"username":message.author.username,
-			"userid":message.author.id
+			"userid":message.author.id,
+			"datenow":Date.now()
 		}, true);
 
 		this.market(message);
@@ -243,8 +329,9 @@ module.exports = {
 					total= btc * qrl;
 					output += order.padStart(3," ")+" ";
 					output += btc.toFixed(8)+' btc/qrl';
-					output += String(arr.qrl).padStart(6," ")+" qrl ";
-					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
+					output += String(arr.qrl).padStart(7," ")+" qrl ";
+					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
+					output += String(timeDifference(Date.now(),arr.datenow))+"\n";
 				});
 				output += "```";
 			}
@@ -264,9 +351,10 @@ module.exports = {
 					order = String(arr.orderid);
 					total= btc * qrl;
 					output += order.padStart(3," ")+" ";
-					output += btc.toFixed(8)+' btc/qrl';
-					output += String(arr.qrl).padStart(6," ")+" qrl ";
-					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+"\n";
+					output += btc.toFixed(9)+' btc/qrl';
+					output += String(arr.qrl).padStart(7," ")+" qrl ";
+					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
+					output += String(timeDifference(Date.now(),arr.datenow))+"\n";
 				});
 				output += "```";
 			}
@@ -278,18 +366,6 @@ module.exports = {
 			output = "No markets available";
 		}
 		message.channel.send(output);
-	},
-	escrow: function(message, command) {
-		// If no command, print 'help'
-
-		// otc escrow list
-
-		// otc escrow order [btc_full] [qrl_full] [party_btc] [party_qrl]
-		// ^ put in new escrow order
-
-		// otc escrow recieved [order_number]
-		// otc escrow review [order_number]
-		// otc escrow status [order_number]
 	},
 	otc:async function(message, subcommand, config) {
 		this.cleanup(message);
