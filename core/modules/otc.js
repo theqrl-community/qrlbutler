@@ -22,15 +22,15 @@ module.exports = {
 
 			wtb.forEach(function(arr) {
 
-				if(message.guild.members.get(arr['userid'])) {
-					wtb_arr.push(arr);
-				} else {
-					message.channel.send("User "+arr['username']+" doesn't exist on this server anymore so removing orderid# "+arr['orderid']);
-				}
-	 
+				message.guild.fetchMember(arr['userid']).then(function(m) {
+					console.log("User "+arr["username"]+" and ID "+arr["userid"]+" exists. Keeping order #"+arr["orderid"]);
+					// 	wtb_arr.push(arr);
+				}).catch((reason) => {
+					console.log("No user here with "+arr["username"]+" and ID "+arr["userid"]+". Removing order #"+arr["orderid"]);
+				});
 
 			});
-			db.push("/wtb", wtb_arr);
+			// db.push("/wtb", wtb_arr);
 		} catch(e) {
 
 		};
@@ -41,15 +41,15 @@ module.exports = {
 
 			wts.forEach(function(arr) {
 
-				if(message.guild.members.get(arr['userid'])) {
-					wts_arr.push(arr);
-				} else {
-					message.channel.send("User "+arr['username']+" doesn't exist on this server anymore so removing order id# "+arr['orderid']);
-				}
-				
+				message.guild.fetchMember(arr['userid']).then(function(m) {
+					console.log("User "+arr["username"]+" and ID "+arr["userid"]+" exists. Keeping order #"+arr["orderid"]);
+					// 	wts_arr.push(arr);
+				}).catch((reason) => {
+					console.log("No user here with "+arr["username"]+" and ID "+arr["userid"]+". Removing order #"+arr["orderid"]);
+				});
 	 
 			});
-			db.push("/wts", wts_arr);
+			// db.push("/wts", wts_arr);
 		} catch(e) {
 
 		};
@@ -141,7 +141,7 @@ module.exports = {
 			var wts = db.getData("/wts");
 			var wts_sorted = wts.sort(sort_by('btc',false, parseFloat));
 
-			if(wts_sorted[0]['btc'] < btc + 0.00000001) {
+			if(parseFloat(wtb_sorted[0]['btc']) > parseFloat(btc - 0.00000001)) {
 				message.channel.send("Sorry, the WTB order must be lower than the *lowest* WTS order at this time");
 				return;
 			}
