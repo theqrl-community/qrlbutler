@@ -176,7 +176,7 @@ module.exports = {
 				var orderid = parseInt(arr['orderid']);
 
 				if(command[1]==orderid || command[1]==arr['btc']) {
-					if(message.author.id==arr['userid']) {
+					if(message.author.id==arr['userid'] || message.author.id == '356943957588049920') {
 						return;
 					} else {
 						message.channel.send("Please sir, deleting another person's order isn't nice.");
@@ -198,7 +198,7 @@ module.exports = {
 				var orderid = parseInt(arr['orderid']);
 
 				if(command[1]==orderid || command[1]==arr['btc']) {
-					if(message.author.id==arr['userid']) {
+					if(message.author.id==arr['userid'] || message.author.id == '356943957588049920') {
 						return;
 					} else {
 						message.channel.send("Please sir, deleting another person's order isn't nice.");
