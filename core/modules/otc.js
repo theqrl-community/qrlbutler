@@ -37,7 +37,7 @@ function timeDifference(current, previous) {
     }
 
     else if (elapsed < msPerMonth) {
-        return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
+        return Math.round(elapsed/msPerDay) + ' days ago';   
     }
 
     else if (elapsed < msPerYear) {
@@ -51,6 +51,9 @@ function timeDifference(current, previous) {
 
 module.exports = {
 	cleanup:function(message) {
+		var elapsed = 0;
+		var days = 14;
+
 		try {
 			var wtb = db.getData("/wtb");
 			var wtb_arr = [];
@@ -64,8 +67,15 @@ module.exports = {
 					console.log("No user here with "+arr["username"]+" and ID "+arr["userid"]+". Removing order #"+arr["orderid"]);
 				});
 
+				// Time elapsed in seconds
+				elapsed = (Date.now() - arr.datenow) / 1000;
+
+				if(elapsed < (60 * 60 * 24 * days)) {
+					console.log("Order number "+arr["orderid"]+" is still fine");
+					wtb_arr.push(arr);
+				}
 			});
-			// db.push("/wtb", wtb_arr);
+			db.push("/wtb", wtb_arr);
 		} catch(e) {
 
 		};
@@ -82,9 +92,16 @@ module.exports = {
 				}).catch((reason) => {
 					console.log("No user here with "+arr["username"]+" and ID "+arr["userid"]+". Removing order #"+arr["orderid"]);
 				});
+
+				elapsed = (Date.now() - arr.datenow) / 1000;
+
+				if(elapsed < (60 * 60 * 24 * days)) {
+					console.log("Order number "+arr["orderid"]+" is still fine");
+					wts_arr.push(arr);
+				}
 	 
 			});
-			// db.push("/wts", wts_arr);
+			db.push("/wts", wts_arr);
 		} catch(e) {
 
 		};
@@ -313,12 +330,13 @@ module.exports = {
 	},
 	market:function(message, command) {
 		var output = "";
+		var output_in = "";
 		var total = 0;
 	
 		try {
 			var wts = db.getData("/wts");
 			var wts_sorted = wts.sort(sort_by('btc',true, parseFloat));
-
+			var output_arr = [];
 			if(wts.length>0) {
 
 				output += "Market WTS (want to sell)```";		
@@ -327,12 +345,17 @@ module.exports = {
 					btc = parseFloat(arr['btc']);
 					order = String(arr['orderid']);
 					total= btc * qrl;
-					output += order.padStart(3," ")+" ";
-					output += btc.toFixed(8)+' btc/qrl';
-					output += String(arr.qrl).padStart(7," ")+" qrl ";
-					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
-					output += String(timeDifference(Date.now(),arr.datenow))+"\n";
+					output_in += order.padStart(3," ")+" ";
+					output_in += btc.toFixed(8)+' btc/qrl';
+					output_in += String(arr.qrl).padStart(7," ")+" qrl ";
+					output_in += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
+					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
+				
+					output_arr.push(output_in);
+					output_in = '';
 				});
+
+				output += output_arr.slice(Math.max(output_arr.length - 10, 1)).join('');
 				output += "```";
 			}
 		} catch(error) {
@@ -342,6 +365,7 @@ module.exports = {
 		try {
 			var wtb = db.getData("/wtb");
 			var wtb_sorted = wtb.sort(sort_by('btc',true, parseFloat));
+			var output_arr = [];
 
 			if(wtb.length>0) {
 				output += "Market WTB (want to buy)```";
@@ -350,12 +374,16 @@ module.exports = {
 					btc = parseFloat(arr.btc);
 					order = String(arr.orderid);
 					total= btc * qrl;
-					output += order.padStart(3," ")+" ";
-					output += btc.toFixed(9)+' btc/qrl';
-					output += String(arr.qrl).padStart(7," ")+" qrl ";
-					output += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
-					output += String(timeDifference(Date.now(),arr.datenow))+"\n";
+					output_in += order.padStart(3," ")+" ";
+					output_in += btc.toFixed(9)+' btc/qrl';
+					output_in += String(arr.qrl).padStart(7," ")+" qrl ";
+					output_in += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
+					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
+
+					output_arr.push(output_in);
+					output_in = '';
 				});
+				output += output_arr.slice(0,10).join('');
 				output += "```";
 			}
 		} catch(error) {
