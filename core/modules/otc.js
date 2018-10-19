@@ -375,7 +375,7 @@ module.exports = {
 					order = String(arr.orderid);
 					total= btc * qrl;
 					output_in += order.padStart(3," ")+" ";
-					output_in += btc.toFixed(9)+' btc/qrl';
+					output_in += btc.toFixed(8)+' btc/qrl';
 					output_in += String(arr.qrl).padStart(7," ")+" qrl ";
 					output_in += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
 					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
@@ -385,6 +385,8 @@ module.exports = {
 				});
 				output += output_arr.slice(0,10).join('');
 				output += "```";
+				output += "* OTC orders are removed automatically after 14 days\n";
+				output += "* Up to 10 orders are shown on either side.\n";
 			}
 		} catch(error) {
 
