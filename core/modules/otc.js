@@ -187,8 +187,8 @@ module.exports = {
 			var wtb_sorted = wtb.sort(sort_by('btc',true, parseFloat));
 
 			if(wtb_sorted[0]['btc'] > btc - 0.00000001) {
-				message.channel.send("Sorry, the WTS order must be higher than the *highest* WTB order at this time");
-				return;
+				message.channel.send("Congratulations, your WTS order is be higher than the *highest* WTB order. See who you can trade with.");
+			//	return;
 			}
 		} catch(error) {
 
@@ -244,8 +244,8 @@ module.exports = {
 			var wts_sorted = wts.sort(sort_by('btc',false, parseFloat));
 
 			if(parseFloat(wtb_sorted[0]['btc']) > parseFloat(btc - 0.00000001)) {
-				message.channel.send("Sorry, the WTB order must be lower than the *lowest* WTS order at this time");
-				return;
+				message.channel.send("Congratulations, your WTB order is lower than the *lowest* WTS order. See who you can trade with");
+				//return;
 			}
 		} catch(error) {
 
@@ -387,6 +387,8 @@ module.exports = {
 				output += "```";
 				output += "* OTC orders are removed automatically after 14 days\n";
 				output += "* Up to 10 orders are shown on either side.\n";
+				output += "* If someone is non-responsive for 3 days for trading, flag jackalyst to remove the order.";
+
 			}
 		} catch(error) {
 
