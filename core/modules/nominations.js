@@ -94,7 +94,7 @@ module.exports = {
 					db.delete("/"+date+"[]/"+medium+'/'+username);	
 				}
 
-				message.channel.send("Congratulations, nominations for <@"+username+"> deleted");
+				message.channel.send("Congratulations, nominations for <@"+username.replace(/[^0-9]/g,'')+"> deleted");
 				console.log("Index "+cmd);
 				this.list(message);
 			} catch(error) {
@@ -107,7 +107,7 @@ module.exports = {
 
 	},
 	list:async function(message, week=null) {
-			
+			console.log("[nominations/list]");
 			var date = (week!=null) ? moment().format("YYYY")+week : this.getdate();
 			var shortlist = [];
 			var output = '';
@@ -127,8 +127,14 @@ module.exports = {
 				}
 				var shortlist = shortlist.sort(sort_by('votes', true));
 
+				if (shortlist.length == 0) {
+					message.channel.send("Sorry, no nominations");
+					return;
+				}
+
 				for (var i = 0; i < shortlist.length; i++) {
-					username = shortlist[i]['username'];
+					username = shortlist[i]['username'];						
+					
 
 					switch(shortlist[i]['medium']) {
 						case 'medium':
@@ -156,7 +162,6 @@ module.exports = {
 
 			} catch(error) {
 				message.channel.send("Can't find nominations for week: "+week);
-				console.error("Oops"+error);
 			}		
 	},
 	nominations:async function(message, subcommand, config) {
