@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const moment = require('moment');
-const client = new Discord.Client();
+const client = new Discord.Client({fetchAllMembers:true});
 
 const fs = require('fs');
 const download = require('download');
@@ -8,17 +8,18 @@ const download = require('download');
 // Load /all/ the modules.
 const modping = require('./modules/ping.js');
 const modprice = require('./modules/price.js');
-const modscreenshot = require('./modules/screenshot.js');
+const modscreenshot = require('./modules/screenshot.js');;
 const modotc = require('./modules/otc.js');
+const modnominations = require('./modules/nominations.js');
 
-console.log("Loaded modules");
+
 
 const modules = {
     echo:function(message, subcommand, config) { modping.echo(message, subcommand, config) },
     screenshot:function(message, subcommand, config) { modscreenshot.screenshot(message, subcommand, config); },
     pricing:function(message, subcommand, config) { modpricing.pricing(message, subcommand, config); },
     otc:function(message, subcommand, config) { modotc.otc(message, subcommand, config); },
-
+    nominations:function(message, subcommand, config) { modnominations.nominations(message, subcommand, config); },    
 };
  
 // Check for environment declaration
@@ -55,11 +56,11 @@ client.on('ready', () => {
 
     setInterval(function() {
         modprice.setprice(client,'btc-qrl');    
-    }, 120 * 1000);
+    }, 180 * 1000);
 });
 
 client.on('message', message => {
-    console.log("Executing message: "+message.content);
+    console.log("[message]"+message.author.username+": "+message.content);
 
 
     // Don't respond to other bots.
@@ -86,7 +87,7 @@ client.on('message', message => {
     }
 
     // Don't filter cmd, just subcommand
-    if(!/^[a-zA-Z0-9-\. ]+$/.test(subcommand)) {
+    if(!/^[a-zA-Z0-9-\._@#\<\> ]+$/.test(subcommand)) {
         message.channel.send("Sorry, that's not a good subcommand");
         return;
     }
@@ -94,4 +95,5 @@ client.on('message', message => {
     modules[command](message, subcommand, functions[cmd]['config']);
 });
 
+console.log("Logging in with "+process.argv[2]+" token: "+token.slice(-10));
 client.login(token);

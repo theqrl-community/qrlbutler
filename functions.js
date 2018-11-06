@@ -1,6 +1,13 @@
 const download = require('./core/node_modules/download');
 const fs = require('fs');
 
+fs.exists('data', function (exists) {
+  if(!exists) {
+    console.log("No data directory, please make one.")
+  }
+});
+
+
 var cgref = {
     module: 'screenshot',
     channel: 'butler',
@@ -14,6 +21,8 @@ var cgref = {
       url: 'https://www.coingecko.com/en/coins/{tickerurl}/tools#panel',
       css: 'coingecko-coin-price-chart-widget',
       preprocess: function(message, subcommand) {
+
+
         var cg_ticker = require('./data/cg.json');
         var chk_symbol=subcommand.toLowerCase().split(' ');
         var chk_id=subcommand.toLowerCase().split(' ');
@@ -127,5 +136,9 @@ module.exports = {
   otc: {
     module: 'otc',
     channel: 'otc'
+  },
+  nominate: {
+    module: 'nominations',
+    channel: 'butler'
   }
 }
