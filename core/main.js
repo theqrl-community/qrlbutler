@@ -87,7 +87,7 @@ client.on('message', message => {
     }
 
     // Don't filter cmd, just subcommand
-    if(!/^[a-zA-Z0-9-\._@#\<\> ]+$/.test(subcommand)) {
+    if(!/^[a-zA-Z0-9-\._@#\*\<\> ]+$/.test(subcommand)) {
         message.channel.send("Sorry, that's not a good subcommand");
         return;
     }

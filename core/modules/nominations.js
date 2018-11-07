@@ -152,9 +152,9 @@ module.exports = {
 						break;
 					}
 					if(url!=null) {
-						output += (i+1)+". "+username+" at "+url+"\n";						
+						output += (i+1)+". ["+shortlist[i]["votes"]+" votes] "+username+" at "+url+"\n";						
 					} else {
-						output += (i+1)+". "+username+"\n";
+						output += (i+1)+". ["+shortlist[i]["votes"]+" votes] "+username+"\n";
 					}
 
 				}
