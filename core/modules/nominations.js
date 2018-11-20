@@ -146,6 +146,9 @@ module.exports = {
 						case 'github':
 							url = "<https://github.com/"+username+">";
 						break;
+						case 'twitter':
+							url = "<https://twitter.com/"+username+">";
+						break;
 						case 'discord':
 							url = null;
 							username = '<@'+username.replace(/[^0-9]/g,'')+'>';
@@ -165,7 +168,7 @@ module.exports = {
 			}		
 	},
 	nominations:async function(message, subcommand, config) {
-		var supported_mediums = ['reddit', 'discord', 'medium', 'github'];
+		var supported_mediums = ['reddit', 'discord', 'medium', 'github', 'twitter'];
 		var	command = subcommand.toLowerCase().split(' ');
 		var date = this.getdate();
 
@@ -237,8 +240,17 @@ module.exports = {
 					return;					
 				}
 			break;
+			case 'twitter':
+				var url = 'https://twitter.com/'+username;
+				var res = sr('GET', url);
+
+				if(res.statusCode == 404) {
+					message.channel.send("No username by that name");
+					return;					
+				}
+			break;
 			default:
-				message.channel.send("Either no medium or no supported medium defined. Supported mediums are `reddit`, `discord`, `github` and `medium`.")
+				message.channel.send("Either no medium or no supported medium defined. Supported mediums are `twitter`, `reddit`, `discord`, `github` and `medium`.")
 			return;
 		}
 
