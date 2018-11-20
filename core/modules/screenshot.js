@@ -42,7 +42,7 @@ module.exports = {
 				}
 
 				await page.setViewport({
-					width: 1200, height: 2500
+					width: 1440, height: 3000
 				});
 
 				const rect = await page.evaluate(selector => {
