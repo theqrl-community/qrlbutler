@@ -32,7 +32,7 @@ var sort_by = function(field, reverse, primer){
 
 module.exports = {
 	getdate: function() {
-		return moment().format('YYYYW');
+		return moment().format('YYYYMM');
 	},
 	add: async function(message, medium, username) {
 		console.log("[nomations/add]: Adding user "+username.id);

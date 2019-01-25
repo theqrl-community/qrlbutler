@@ -1,5 +1,6 @@
 const download = require('./core/node_modules/download');
 const fs = require('fs');
+var config = require('./env.json')[process.argv[2]];
 
 fs.exists('data', function (exists) {
   if(!exists) {
@@ -12,7 +13,7 @@ var cgref = {
     module: 'screenshot',
     channel: 'butler',
     preload: function() {
-    var url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd';
+    var url = 'https://api.coingecko.com/api/v3/coins/list';
       download(url).then((data) => {
         fs.writeFileSync('data/cg.json', data);
       });
@@ -34,6 +35,7 @@ var cgref = {
 
           // Check against ticker. Moonwalk
           for (var i = 0; i < cg_ticker.length; i++) {
+              console.log(cg_ticker[i]['symbol']);
               if(cg_ticker[i]['symbol']==chk_symbol[b] || cg_ticker[i]['id']==chk_id[b]) {
                 count++; 
                 if(count>max) {
@@ -70,6 +72,7 @@ var cgref = {
     }
   };
 
+console.log("Environment: "+process.argv[2]);
 
 module.exports = {
   cg: cgref,
@@ -78,16 +81,17 @@ module.exports = {
     module: 'screenshot',
     channel: 'butler',
     preload: function() {
-		var url = 'http://api.coinmarketcap.com/v1/ticker/?limit=1200';
-  		download(url).then((data) => {
-        fs.writeFileSync('data/cmc.json', data);
-      });
+  		var url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=1500&convert=USD&CMC_PRO_API_KEY='+config.cmcapi
+
+      // download(url).then((data) => {
+      //   fs.writeFileSync('data/cmc.json', data);
+      // });
     },
     config: {
       url: 'https://coinmarketcap.com/currencies/{tickerurl}/#tools',
       css: '.coinmarketcap-currency-widget',
       preprocess: function(message, subcommand) {
-        var cmc_ticker = require('./data/cmc.json');
+        var cmc_ticker = require('./data/cmc.json').data;
         var chk_symbol=subcommand.toUpperCase().split(' ');
         var chk_id=subcommand.toLowerCase().split(' ');
         var ticker=[];
@@ -103,10 +107,10 @@ module.exports = {
                 if(count>max) {
                   break;
                 }
-                console.log("Getting page: "+cmc_ticker[i]['id'])
+                console.log("Getting page: "+cmc_ticker[i]['slug'])
 
                 ticker.push({
-                  url:'https://coinmarketcap.com/currencies/'+cmc_ticker[i]['id']+'/#tools',
+                  url:'https://coinmarketcap.com/currencies/'+cmc_ticker[i]['slug']+'/#tools',
                   filename:'screenshot.'+cmc_ticker[i]['id']+'.png'
                 });
       
