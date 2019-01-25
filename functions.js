@@ -83,9 +83,9 @@ module.exports = {
     preload: function() {
   		var url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=1500&convert=USD&CMC_PRO_API_KEY='+config.cmcapi
 
-      // download(url).then((data) => {
-      //   fs.writeFileSync('data/cmc.json', data);
-      // });
+      download(url).then((data) => {
+        fs.writeFileSync('data/cmc.json', data);
+      });
     },
     config: {
       url: 'https://coinmarketcap.com/currencies/{tickerurl}/#tools',
