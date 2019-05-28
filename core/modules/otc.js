@@ -337,6 +337,9 @@ module.exports = {
 			var wts = db.getData("/wts");
 			var wts_sorted = wts.sort(sort_by('btc',true, parseFloat));
 			var output_arr = [];
+
+			console.log(wts);
+
 			if(wts.length>0) {
 
 				output += "Market WTS (want to sell)```";		
@@ -355,7 +358,7 @@ module.exports = {
 					output_in = '';
 				});
 
-				output += output_arr.slice(Math.max(output_arr.length - 10, 1)).join('');
+				output += output_arr.slice(Math.max(output_arr.length - 9, 0)).join('');
 				output += "```";
 			}
 		} catch(error) {
