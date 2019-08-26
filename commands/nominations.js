@@ -167,7 +167,7 @@ module.exports = {
 				message.channel.send("Can't find nominations for week: "+week);
 			}		
 	},
-	nominations:async function(message, subcommand, config) {
+	run:async function(message, subcommand, config) {
 		var supported_mediums = ['reddit', 'discord', 'medium', 'github', 'twitter'];
 		var	command = subcommand.toLowerCase().split(' ');
 		var date = this.getdate();

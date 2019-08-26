@@ -2,11 +2,13 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 module.exports = {
-	screenshot:async function(message, subcommand, config) {
+	run:async function(message, subcommand, config) {
 		console.log("Executing screenshot module");
+		
 		var filename = '';
 		var url = '';
 		var page ='';
+
 		// Preprocess generates the final URL 
 		if(config.preprocess) {
 			var preparam = config.preprocess(message, subcommand);
@@ -42,7 +44,7 @@ module.exports = {
 				}
 
 				await page.setViewport({
-					width: 1440, height: 3000
+					width: 2000, height: 5000
 				});
 
 				const rect = await page.evaluate(selector => {
