@@ -402,7 +402,7 @@ module.exports = {
 		}
 		message.channel.send(output);
 	},
-	otc:async function(message, subcommand, config) {
+	run:async function(message, subcommand, config) {
 		this.cleanup(message);
 		var	command = subcommand.toLowerCase().split(' ');
 
