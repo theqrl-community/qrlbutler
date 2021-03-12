@@ -16,18 +16,16 @@ if(!process.argv[2]) {
     return;
 }
 
-// Check for env.json
+// Check for env.json file.
 if(!fs.existsSync('./env.json')) {
-    console.log("Check for env.json");
+    console.log("env.json is missing.");
     return;
 }
 
-// load config
+// Load configuration
 var global_config = require('./env.json')['config'];
 var environment_config = require('./env.json')[process.argv[2]];
 const config = { ...global_config, ...environment_config};
-
-
 console.log("Declared environment variables!");
 
 
@@ -63,21 +61,24 @@ for(key in functions) {
 
 console.log("Omnipresent modules: "+omnipresent_modules.join(', '));
 
+
+
 client.on('ready', () => {
     console.log("Ready to serve");
 
     setInterval(function() {
-        var res = sr('GET', "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&symbols=btc,qrl");
+        var res = sr('GET','https://market-data.automated.theqrl.org/');
         var resjson = JSON.parse(res.getBody('utf8'));
 
-        var btcusd = resjson[0].current_price;
-        var qrlusd = resjson[1].current_price;
+        var qrlusd = resjson.price;
 
-        var sat = qrlusd / btcusd * 100000;
+        client.user.setActivity("$"+qrlusd.toFixed(3));
 
-        client.user.setActivity("$"+qrlusd.toFixed(2)+" | "+sat.toFixed(1)+"k Sat");
-    }, 1 * 60 * 1000);
+    }, 10 * 1000);
 });
+
+
+
 
 client.on('message', message => {
     console.log("["+moment().format()+"] "+message.author.username+": "+message.content);
@@ -85,28 +86,49 @@ client.on('message', message => {
     // Don't respond to other bots.
     if(message.author.bot) return;
 
+    // Get member
+    var member=message.author;
+
+    // Don't allow direct messages (potential for abuse)
     if(message.channel.type == 'dm') {
         message.channel.send("Sorry, no direct messages are allowed");
         return;
     }
 
-    // Run through each module that gets executed for each message
-    for (var i = 0; i < omnipresent_modules.length; i++) {
-        console.log("Executing "+omnipresent_modules[i]);
-        omnipresent = client.commands.get(omnipresent_modules[i]);
-        
-        omnipresent.run(message, functions[omnipresent_modules[i]]['config']);
+
+    if (Date.now() - message.author.createdAt < 1000*60*60*24*30) {
+      console.log('User joined in the last 30 days'+message.author.createdAt);
     }
 
-    if(!message.content.startsWith(config['prefix'])) return;
 
-    let command = message.content.toLowerCase().split(' ')[0];
-    command = command.slice(config['prefix'].length);
+    var command = '';
+    
+    // Check if there's a command, and if so, what is it?
+    if(message.content.startsWith(config['prefix'])) {
+        
+        command = message.content.toLowerCase().split(' ')[0];
+        command = command.slice(config['prefix'].length);
+    }
+
+    // If it's not a real command, run through omnipresent_modules and return
+    if(command == '') {
+        // Run through each module that gets executed for each message
+        for (var i = 0; i < omnipresent_modules.length; i++) {
+            console.log("Executing omnipresent module: "+omnipresent_modules[i]);
+
+            omnipresent = client.commands.get(omnipresent_modules[i]);
+            omnipresent.run(message, '', functions[omnipresent_modules[i]]['config']);
+        }
+        return;
+    } else {
+        console.log('Executing: '+command);
+    }
+
+
     let cmd = client.commands.get(command);
-
     let args = message.content.toLowerCase().split(' ').slice(1);
 
-    // // Check if it's the right channel
+    // Check if it's the right channel
     if(functions[command]["channels"]) {
         if(functions[command]["channels"] != message.channel.name) {
             message.reply("Command executed in wrong channel").then(msg => { msg.delete(5000) }).catch();
@@ -120,22 +142,14 @@ client.on('message', message => {
 });
 
 
-// client.on("messageUpdate", (message, newmessage) => {
-//     console.log("[message] "+message.channel.name+" "+message.author.username+": "+newmessage.content);
+client.on("guildMemberAdd", member => {
+	// console.log("!!! GuildMemberAdd: "+member.user.username+' account creation date '+member.user.createdAt);
 
-//     newmessage.content = "[edited]"+newmessage.content;
-
-//     // Don't respond to other bots.
-//     if(message.author.bot) return;
-
-
-//     // Send to omnipresent module
-//     for (var i = 0; i < omnipresent_modules.length; i++) {
-//         var mod = omnipresent_modules[i];
-//         var command = functions[mod]['module'];
-//         modules[command](newmessage, functions[mod]['config']);
-//     }
-// });
+ //    // Don't know the role id?
+ //    const role = member.guild.roles.find(role => role.name === 'probation');
+ //    //member.addRole(role);
+});
 
 console.log("Logging in with "+process.argv[2]+" token: "+config['token'].slice(-10));
+
 client.login(config['token']);
