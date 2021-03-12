@@ -1,5 +1,5 @@
 module.exports = {
-	run:async function(message, config) {
+	run:async function(message, command, config) {
 		var base_language = 'en';
 		var second_language = null;
 
