@@ -7,25 +7,29 @@ var environment_config = require('./env.json')[process.argv[2]];
 const config = { ...global_config, ...environment_config};
 
 module.exports = {
+  ban: {
+    module:'roles',
+    omnipresence: true
+  },
   ping: {
     module:'ping',
-    channels: 'butler'
+    channels: 'bot'
   },
   translate: {
     module:'l10n',
     omnipresence: true
   },
-  nominate: {
-    module: 'nominations',
-    channel: 'butler'
-  },
   otc: {
     module: 'otc',
-    channel: 'otc'
+    channels: 'otc'
+  },
+  i: {
+    module:'node',
+    channels:'bot'
   },
   cmc: {
     module: 'screenshot',
-    channels: 'butler',
+    channels: 'bot',
     preload: function() {
       var url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=1500&convert=USD&CMC_PRO_API_KEY='+config.cmcapi
 
@@ -39,8 +43,8 @@ module.exports = {
       }
     },
     config: {
-      url: 'https://coinmarketcap.com/currencies/{tickerurl}/#tools',
-      css: '.coinmarketcap-currency-widget',
+      url: 'https://coinmarketcap.com/currencies/{tickerurl}/',
+      css: '[class*="priceSection___"]',
       preprocess: function(message, subcommand) {
         var cmc_ticker = require('./data/cmc.json').data;
         var chk_symbol=subcommand.toUpperCase().split(' ');
@@ -61,7 +65,7 @@ module.exports = {
                 console.log("Getting page: "+cmc_ticker[i]['slug'])
 
                 ticker.push({
-                  url:'https://coinmarketcap.com/currencies/'+cmc_ticker[i]['slug']+'/#tools',
+                  url:'https://coinmarketcap.com/currencies/'+cmc_ticker[i]['slug']+'/',
                   filename:'screenshot.'+cmc_ticker[i]['id']+'.png'
                 });
       
@@ -90,12 +94,15 @@ module.exports = {
   },
   cg:{
     module: 'screenshot',
-    channels: 'butler',
+    channels: 'bot',
     preload: function() {
     var url = 'https://api.coingecko.com/api/v3/coins/list';
-      download(url).then((data) => {
-        fs.writeFileSync('data/cg.json', data);
-      });
+      if(!fs.existsSync('data/cg.json')) {
+        console.log("Getting new data/cg.json file");
+        download(url).then((data) => {
+          fs.writeFileSync('data/cg.json', data);
+        });
+      }
     },
     config: {
       url: 'https://www.coingecko.com/en/coins/{tickerurl}/tools#panel',
