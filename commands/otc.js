@@ -1,5 +1,10 @@
-const jdb = require('node-json-db');
-const db = new jdb("otc", true, true);
+const JsonDB = require('node-json-db').JsonDB;
+const Config = require('node-json-db/dist/lib/JsonDBConfig').Config;
+
+var db = new JsonDB(new Config("otc", true, true, '/'));
+
+
+
 var orderid=0;
 var sort_by = function(field, reverse, primer){
 
@@ -52,7 +57,7 @@ function timeDifference(current, previous) {
 module.exports = {
 	cleanup:function(message) {
 		var elapsed = 0;
-		var days = 14;
+		var days = 28;
 
 		try {
 			var wtb = db.getData("/wtb");
@@ -388,7 +393,7 @@ module.exports = {
 				});
 				output += output_arr.slice(0,10).join('');
 				output += "```";
-				output += "* OTC orders are removed automatically after 14 days\n";
+				output += "* OTC orders are removed automatically after 28 days\n";
 				output += "* Up to 10 orders are shown on either side.\n";
 				output += "* If someone is non-responsive for 3 days for trading, flag jackalyst to remove the order.";
 
@@ -398,7 +403,7 @@ module.exports = {
 		}
 
 		if(output=="") {
-			output = "No markets available";
+			output = "There's no open orders in the markets available at this time. You can create one with `.otc wtb [btc price] [quantity]`";
 		}
 		message.channel.send(output);
 	},

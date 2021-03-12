@@ -1,5 +1,5 @@
 module.exports = {
-	run:async function(message, config) {
+	run:async function(message, command, config) {
 		var base_language = 'en';
 		var second_language = null;
 
@@ -11,7 +11,9 @@ module.exports = {
 			es:['spanish','es','español'],
 			eo:['esperanto','eo'],
 			nl:['nederlands','nl'],
-			it:['italian','italiano','it']
+			it:['italian','it','italiano'],
+			zh:['chinese','zh','中文'],
+			ko:['korean','ko','한국어']
 		};
 
 		// What channel are we in?
