@@ -1,29 +1,31 @@
 {
-  "name": "qrlbutler",
-  "version": "0.0.2",
-  "description": "Discord Helper Bot for QRL",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@google-cloud/translate": "^3.0.1",
-    "bufferutil": "^3.0.5",
-    "discord.js": "^11.5.1",
-    "download": "^7.1.0",
-    "erlpack": "github:discordapp/erlpack",
-    "moment": "^2.24.0",
-    "node-json-db": "^0.9.2",
-    "node-opus": "^0.3.2",
-    "opusscript": "0.0.6",
-    "puppeteer": "^1.19.0",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.2",
-    "sodium": "^3.0.2",
-    "sync-request": "^6.0.0",
-    "uws": "^99.0.0",
-    "zlib-sync": "^0.1.5"
-  }
+	"name": "qrlbutler",
+	"version": "0.0.2",
+	"description": "Discord Helper Bot for QRL",
+	"main": "main.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"update:packages": "node wipedep.js && rm -rf node_modules && npm update --save-dev && npm update --save"
+	},
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"@google-cloud/translate": "*",
+		"bufferutil": "*",
+		"discord.js": "*",
+		"download": "*",
+		"erlpack": "github:discordapp/erlpack",
+		"moment": "*",
+		"node-json-db": "*",
+		"node-opus": "*",
+		"opusscript": "0.0.6",
+		"puppeteer": "^8.0.0",
+		"puppeteer-core": "*",
+		"request": "*",
+		"request-promise": "*",
+		"sodium": "*",
+		"sync-request": "*",
+		"uws": "*",
+		"zlib-sync": "*"
+	}
 }
