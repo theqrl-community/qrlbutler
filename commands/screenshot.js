@@ -44,10 +44,11 @@ module.exports = {
 				}
 
 				await page.setViewport({
-					width: 2000, height: 5000
+					width: 1920, height: 4000
 				});
 
 				const rect = await page.evaluate(selector => {
+					console.log("Selector is:"+selector);
 					const element = document.querySelector(selector);
 					const { x, y, width, height } = element.getBoundingClientRect();
 					return { left: x, top: y, width, height, id: element.id };
@@ -68,9 +69,11 @@ module.exports = {
 				console.log("ERROR:", error);
 			}
 
-			message.channel.send("<"+preparam[i].url+">", { 
-				file:filename 
-			}).then((err) => fs.unlink(filename, (error) => {} )).catch(console.error);
+			message.channel.send("<"+preparam[i].url+">", 
+				{ 
+					files:[filename] 
+				}
+			).then((err) => fs.unlink(filename, (error) => {} )).catch(console.error);
 
 		}
 
