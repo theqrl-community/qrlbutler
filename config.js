@@ -1,6 +1,18 @@
 const fs = require('fs');
 const download = require('download');
 
+Object.defineProperty(String.prototype, 'startsWithArray', {
+  value: function(search, rawPos) {
+        var pos = rawPos > 0 ? rawPos | 0 : 0;
+    for (var i = 0; i < search.length; i++) {
+      if (this.substring(pos, pos + search[i].length) === search[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+});
+
 // load config
 var global_config = require('./env.json')['config'];
 var environment_config = require('./env.json')[process.argv[2]];
@@ -9,7 +21,8 @@ const config = { ...global_config, ...environment_config};
 module.exports = {
   ban: {
     module:'roles',
-    omnipresence: true
+    prefix:'+',
+    channels:'_global_'
   },
   ping: {
     module:'ping',
