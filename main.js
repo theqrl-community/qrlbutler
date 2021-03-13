@@ -43,24 +43,38 @@ if(!config['cmcapi']) {
 // Load functions
 const functions = require('./config.js');
 var omnipresent_modules = [];
+var available_commands = [];
+var prefix = [];
+
+prefix.push(config.prefix);
+
 
 for(key in functions) {
+    console.log("Loaded and applied config for "+functions[key].module+":"+key);
     var prop = require('./commands/'+functions[key].module+'.js');
     prop.config = functions[key];
 
+    if(functions[key].prefix) {
+        prefix.push(functions[key].prefix);
+    }
     if(functions[key].omnipresence) {
         omnipresent_modules.push(key);
+    } else {
+        // Assign function key to function
+        available_commands.push(key);
     }
+    client.commands.set(key, prop);
 
-    client.commands.set(key, prop)
 
     if(functions[key].preload) {
+        console.log("Preloading function for "+functions[key].module+":"+key);
         functions[key].preload();
     }
 }
 
-console.log("Omnipresent modules: "+omnipresent_modules.join(', '));
-
+console.log("Prefix's to look for: "+prefix);
+console.log("Omnipresent modules loaded: "+omnipresent_modules.join(', '));
+console.log("Functions available: "+available_commands.join(', '));
 
 
 client.on('ready', () => {
@@ -101,17 +115,20 @@ client.on('message', message => {
     }
 
 
-    var command = '';
+    var command = false;
     
-    // Check if there's a command, and if so, what is it?
-    if(message.content.startsWith(config['prefix'])) {
-        
+    // Check if there's a command, then assign command
+    if(message.content.startsWithArray(prefix)) {
         command = message.content.toLowerCase().split(' ')[0];
-        command = command.slice(config['prefix'].length);
+        command = command.slice(1);
+
+        if (available_commands.indexOf(command) === -1) {
+            command = false;
+        }
     }
 
-    // If it's not a real command, run through omnipresent_modules and return
-    if(command == '') {
+    // If there's no command, execute omnipresent_module's
+    if(!command) {
         // Run through each module that gets executed for each message
         for (var i = 0; i < omnipresent_modules.length; i++) {
             console.log("Executing omnipresent module: "+omnipresent_modules[i]);
@@ -125,14 +142,23 @@ client.on('message', message => {
     }
 
 
+    // If no prefix is assigned, ensure it's using the default
+    if(!functions[command]["prefix"]) {
+        if( !message.content.startsWith( config.prefix ) ) {
+            return;
+        }
+    }
+
     let cmd = client.commands.get(command);
     let args = message.content.toLowerCase().split(' ').slice(1);
 
-    // Check if it's the right channel
-    if(functions[command]["channels"]) {
-        if(functions[command]["channels"] != message.channel.name) {
-            message.reply("Command executed in wrong channel").then(msg => { msg.delete(5000) }).catch();
-            return;
+    // Check if it's the right channel, except for global functions!
+    if(!functions[command]["channels"]==="_global_") { 
+        if(functions[command]["channels"]) {
+            if(functions[command]["channels"] != message.channel.name) {
+                message.reply("Command executed in wrong channel").then(msg => { msg.delete(5000) }).catch();
+                return;
+            }
         }
     }
 
@@ -143,13 +169,13 @@ client.on('message', message => {
 
 
 client.on("guildMemberAdd", member => {
-	// console.log("!!! GuildMemberAdd: "+member.user.username+' account creation date '+member.user.createdAt);
+	console.log("!!! GuildMemberAdd: "+member.user.username+' account creation date '+member.user.createdAt);
 
  //    // Don't know the role id?
- //    const role = member.guild.roles.find(role => role.name === 'probation');
+    // const role = member.guild.roles.find(role => role.name === 'probation');
  //    //member.addRole(role);
 });
 
-console.log("Logging in with "+process.argv[2]+" token: "+config['token'].slice(-10));
+console.log("Logging in with "+process.argv[2]+" token: ..."+config['token'].slice(-10));
 
 client.login(config['token']);
