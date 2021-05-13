@@ -1,7 +1,15 @@
+var projectId = 'qrlbutler-1555659563442';
+const {Translate} = require('@google-cloud/translate').v2;
+const translate = new Translate({projectId});
+const Discord = require('discord.js');
+
 module.exports = {
 	run:async function(message, command, config) {
+		// Base language of server: Doesn't change.
 		var base_language = 'en';
-		var second_language = null;
+
+		// Channel language: Base language of channel, unless indicated.
+		var channel_language = 'en';
 
 		// Channel detection!
 		var languages = {
@@ -16,23 +24,26 @@ module.exports = {
 			ko:['korean','ko','한국어']
 		};
 
-		// What channel are we in?
 
-		// Change base language if channel
+		console.log(message.channel.name.toLowerCase());
+		
+		// Change base language of channel
 		for(var prop in languages) {
 			if(languages.hasOwnProperty(prop)){
 				if(languages[prop].indexOf( message.channel.name.toLowerCase() ) !== -1) {
-					second_language = prop;
+					channel_language = prop;
 				}
 			}
 		}
 
-		if(second_language==null) {
-			return;
-		}
-		console.log('i18n | base_language to: '+base_language);
-		console.log('i18n | second_language to: '+second_language);
 
+		if(channel_language=='en') {
+			// return;
+		}
+
+		console.log('i18n | base_language: '+base_language+', channel_language: '+channel_language);
+
+		// Manual translation module.
 	    const cmd = message.content.toLowerCase().split(' ')
     	const subcommand = message.content.split(' ').slice(2).join(' ');
 
@@ -51,11 +62,6 @@ module.exports = {
 			}
 		}
 
-  		var projectId = 'qrlbutler-1555659563442';
-		const {Translate} = require('@google-cloud/translate');
-
-		const translate = new Translate({projectId});
-
 		const text = message.content;
 
 		// Detect if language is not english
@@ -64,42 +70,32 @@ module.exports = {
 		detections = Array.isArray(detections) ? detections : [detections];
 		
 		detections.forEach(detection => {
-			console.log(`${detection.input} => ${detection.language}`);
+			detected_language = detection.language.substring(0,2);
+			console.log(`i10n | detected language: ${detected_language}`);
 
-			if(detection.language != base_language && detection.language != 'und' && !second_language) {
-				this.translate(message, text, base_language);
+			// Translate in place if detected_language != channel_language
+			if(detected_language != channel_language) {
+				this.translate(message, text, channel_language);
 			}
-			// If you're in a language channel
-			if(second_language !== null) {
 
-				// translate if the language is not that language
-				if(detection.language != second_language && detection.language != 'und') {
-					this.translate(message, text, second_language);
-				}
+			// If we're in a language channel, log engliash to language-log
+			if(channel_language !== 'en') {
 				// translate to english the language is that language
-				if(detection.language == second_language && detection.language != 'und') {
+				if(detected_language === channel_language && detected_language != 'und') {
 					this.translate(message, text, base_language, 'language-log');
-				}			
+				}		
 			}
+
 		});
 	},
+
 	translate:async function(message, content, target_language, target_channel) {
-
-  		var projectId = 'qrlbutler-1555659563442';
-		// Imports the Google Cloud client library
-		const {Translate} = require('@google-cloud/translate');
-
-		// Instantiates a client
-		const translate = new Translate({projectId});
-
 		// The text to translate
 		const text = content;
-
 		const target = target_language;
 
 		let [translations] = await translate.translate(text, target);
 		translations = Array.isArray(translations) ? translations : [translations];
-		
 		
 		translations.forEach((translation, i) => {
 		  console.log(`i18n | ${text} => (${target}) ${translation}`);
@@ -118,12 +114,21 @@ module.exports = {
 		  	return testing;
 		  });
 
+		  const embed = new Discord.MessageEmbed()
+		  	.setTitle("Translation message author / channel")
+			.addFields(
+				{ name: 'Message', value: `${text}` },
+				{ name: 'Translated (en)', value:`${translation}` },
+			)
+		  	.setColor(0x000033)
+		  	.setDescription("<@"+message.member.user.id+"> / <#"+message.channel.id+"> ");
+
 		  if(target_channel) {
-			console.log("Targeting channel");
-			let channel = message.client.channels.find('name', target_channel);
+			let channel = message.client.channels.cache.find(channel => channel.name === target_channel);
 
 			if(channel) {
-    			message.client.channels.get('570415965393649674').send(message.member.user.tag+" @ <#"+message.channel.id+"> "+` ${text} => (${target}) ${translation}`);
+				channel.send(embed);
+ //   			message.client.channels.get('841661924504633404').send(message.member.user.tag+" @ <#"+message.channel.id+"> "+` ${text} => (${target}) ${translation}`);
 			}
 
 		  } else {
@@ -133,7 +138,6 @@ module.exports = {
 		});
 	},
 	cleanup:async function(text) {
-		// Cleanup from google translate
 		return text;
 	}
 }
