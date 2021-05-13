@@ -56,123 +56,78 @@ function timeDifference(current, previous) {
 
 module.exports = {
 	cleanup:function(message) {
+		console.log("otc | performing cleanup");
 		var elapsed = 0;
 		var days = 28;
 
 		try {
-			var wtb = db.getData("/wtb");
-			var wtb_arr = [];
-
-			wtb.forEach(function(arr) {
-
-				message.guild.fetchMember(arr['userid']).then(function(m) {
-					console.log("User "+arr["username"]+" and ID "+arr["userid"]+" exists. Keeping order #"+arr["orderid"]);
-					// 	wtb_arr.push(arr);
-				}).catch((reason) => {
-					console.log("No user here with "+arr["username"]+" and ID "+arr["userid"]+". Removing order #"+arr["orderid"]);
-				});
-
-				// Time elapsed in seconds
-				elapsed = (Date.now() - arr.datenow) / 1000;
-
-				if(elapsed < (60 * 60 * 24 * days)) {
-					console.log("Order number "+arr["orderid"]+" is still fine");
-					wtb_arr.push(arr);
-				}
-			});
-			db.push("/wtb", wtb_arr);
-		} catch(e) {
-
-		};
-
-		try {
 			var wts = db.getData("/wts");
 			var wts_arr = [];
 
-			wts.forEach(function(arr) {
-
-				message.guild.fetchMember(arr['userid']).then(function(m) {
-					console.log("User "+arr["username"]+" and ID "+arr["userid"]+" exists. Keeping order #"+arr["orderid"]);
-					// 	wts_arr.push(arr);
-				}).catch((reason) => {
-					console.log("No user here with "+arr["username"]+" and ID "+arr["userid"]+". Removing order #"+arr["orderid"]);
+			if(wts.length>0) {
+				wts.forEach(function(arr) {
+					date = arr.datenow;
+					elapsed = (Date.now() - date) / 1000;
+					
+					if(elapsed < (60 * 60 * 24 * days)) {
+						console.log("ots | Order number "+arr["orderid"]+" is still fine");
+						wts_arr.push(arr);
+					} else {
+						console.log("ots | Order number "+arr["orderid"]+" is has expired");
+					}
 				});
-
-				elapsed = (Date.now() - arr.datenow) / 1000;
-
-				if(elapsed < (60 * 60 * 24 * days)) {
-					console.log("Order number "+arr["orderid"]+" is still fine");
-					wts_arr.push(arr);
-				}
-	 
-			});
-			db.push("/wts", wts_arr);
-		} catch(e) {
-
-		};
-
-
-		var currenttime = Date.now();
-
-		try {
-			var wts = db.getData("/wts");
-			var wts_arr = [];
-			var updatedb = false;
-
-			wts.forEach(function(arr) {
-				if(arr['datenow']) {
-					// Get seconds
-					// secondsPast = (now.getTime() - arr.getTime()) / 1000;
-				} else {
-					arr['datenow'] = Date.now();
-										updatedb = true;
-
-				}
-				wts_arr.push(arr);
-			});
-			if(updatedb===true) {
-				db.push("/wts",wts_arr);
 			}
-
-		} catch(e) {
-
+			db.push("/wts", wts_arr);
+		} catch(error) {
+			console.log(error);
 		}
 
 		try {
-			var wtb = db.getData("/wtb");
+			var wtb = db.getData("/wts");
 			var wtb_arr = [];
-			var updatedb = false;
 
-			wtb.forEach(function(arr) {
-				if(arr['datenow']) {
-
-				} else {
-					arr['datenow'] = Date.now();
-					updatedb = true;
-				}
-				wtb_arr.push(arr);
-			});
-			if(updatedb===true) {
-				db.push("/wtb",wtb_arr);				
+			if(wtb.length>0) {
+				wtb.forEach(function(arr) {
+					date = arr.datenow;
+					elapsed = (Date.now() - date) / 1000;
+					
+					// Check if it's fine... 
+					if(elapsed < (60 * 60 * 24 * days)) {
+						console.log("ots | Order number "+arr["orderid"]+" is still fine");
+						wtb_arr.push(arr);
+					} else {
+						console.log("ots | Order number "+arr["orderid"]+" is has expired");
+					}
+				});
 			}
-
-		} catch(e) {
-
+			db.push("/wtb", wtb_arr);
+		} catch(error) {
+			console.log(error);
 		}
 	},
 	wts:function(message, command) {
 		var btc = command[1];
 		var qrl = command[2];
+		var pref = command[3];
+
+		if(!pref) {
+			pref = "BTC";
+		}
+		if(!/^([a-zA-Z0-9]{3,9})$/.test(pref)) {
+			pref = "BTC";
+		}
 
 		// Check if there's characters...
 		if(!btc || !qrl) {
 			message.channel.send("otc wts [btc/qrl] [qrl]")
 			return;
 		}
+
 	    if(!/^[0-9\.]+$/.test(btc) || !/^[0-9\.]+$/.test(qrl)) {
 	        message.channel.send("That's not a number I understand");
 	        return;
 	    }
+
 		btc = parseFloat(btc);
 		qrl = parseFloat(qrl);
 
@@ -199,7 +154,7 @@ module.exports = {
 
 		};
 
-		message.channel.send("Market WTS order at "+btc+" for "+qrl+" QRL for a total of ("+total+" BTC)");
+		message.channel.send("Market WTS order at "+btc+" for "+qrl+" QRL for a total of ("+total+" BTC) with a preference of: "+pref);
 
 		// Get orderid
 		db.push('/orderid[]',{});
@@ -207,6 +162,7 @@ module.exports = {
 
 		db.push("/wts[]", {
 			"orderid":orderid,
+			"pref":pref.toUpperCase(),
 			"btc":btc,
 			"qrl":qrl,
 			"username":message.author.username,
@@ -219,6 +175,14 @@ module.exports = {
 	wtb:function(message, command) {
 		var btc = command[1];
 		var qrl = command[2];
+		var pref = command[3];
+
+		if(!pref) {
+			pref = "BTC";
+		}
+		if(!/^([a-zA-Z0-9]{3,9})$/.test(pref)) {
+			pref = "BTC";
+		}
 
 		if(!btc || !qrl) {
 			message.channel.send("otc wtb [btc/qrl] [qrl]")
@@ -257,7 +221,7 @@ module.exports = {
 		};
 
 
-		message.channel.send("Market WTB order at "+btc+" for "+qrl+" QRL for a total of ("+total+" BTC)");
+		message.channel.send("Market WTB order at "+btc+" for "+qrl+" QRL for a total of ("+total+" BTC) with a preference of: "+pref);
 	
 			// Get orderid
 		db.push('/orderid[]',{});
@@ -265,6 +229,7 @@ module.exports = {
 
 		db.push("/wtb[]", {
 			"orderid":orderid,
+			"pref":pref.toUpperCase(),
 			"btc":btc,
 			"qrl":qrl,
 			"username":message.author.username,
@@ -343,8 +308,6 @@ module.exports = {
 			var wts_sorted = wts.sort(sort_by('btc',true, parseFloat));
 			var output_arr = [];
 
-			console.log(wts);
-
 			if(wts.length>0) {
 
 				output += "Market WTS (want to sell)```";		
@@ -352,8 +315,11 @@ module.exports = {
 					qrl = parseFloat(arr['qrl']);
 					btc = parseFloat(arr['btc']);
 					order = String(arr['orderid']);
+					pref = arr['pref'];
+					if(pref==undefined) { pref = "BTC" }
 					total= btc * qrl;
 					output_in += order.padStart(3," ")+" ";
+					output_in += String("[Trade:"+pref+"] ");
 					output_in += btc.toFixed(8)+' btc/qrl';
 					output_in += String(arr.qrl).padStart(7," ")+" qrl ";
 					output_in += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
@@ -381,8 +347,11 @@ module.exports = {
 					qrl = parseFloat(arr.qrl);
 					btc = parseFloat(arr.btc);
 					order = String(arr.orderid);
+					pref = arr['pref'];
+					if(pref==undefined) { pref = "BTC" }
 					total= btc * qrl;
 					output_in += order.padStart(3," ")+" ";
+					output_in += String("[Trade:"+pref+"] ");
 					output_in += btc.toFixed(8)+' btc/qrl';
 					output_in += String(arr.qrl).padStart(7," ")+" qrl ";
 					output_in += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
@@ -431,7 +400,7 @@ module.exports = {
 				this.clearall(message, command);
 			break;
 			default:
-				message.channel.send("**Look at the market**\n`otc market`\n\n**Set a WTS (Want to Sell) order**\n`otc wts [btc/qrl] [qrl]`\n\n**Set a WTB (Want to Buy) order**\n`otc wtb [btc/qrl] [qrl]`\n\n**Remove an order**\n`otc clear [order number]`")
+				message.channel.send("**Look at the market**\n`otc market`\n\n**Set a WTS (Want to Sell) order**\n`otc wts [btc/qrl] [qrl] [preference]`\n\n**Set a WTB (Want to Buy) order**\n`otc wtb [btc/qrl] [qrl] [preference]`\n\n**Remove an order**\n`otc clear [order number]`")
 
 		}
 
