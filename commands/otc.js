@@ -70,10 +70,10 @@ module.exports = {
 					elapsed = (Date.now() - date) / 1000;
 					
 					if(elapsed < (60 * 60 * 24 * days)) {
-						console.log("ots | Order number "+arr["orderid"]+" is still fine");
+						console.log("ots | WTS: Order number "+arr["orderid"]+" is still fine");
 						wts_arr.push(arr);
 					} else {
-						console.log("ots | Order number "+arr["orderid"]+" is has expired");
+						console.log("ots | WTS: Order number "+arr["orderid"]+" has expired");
 					}
 				});
 			}
@@ -83,7 +83,7 @@ module.exports = {
 		}
 
 		try {
-			var wtb = db.getData("/wts");
+			var wtb = db.getData("/wtb");
 			var wtb_arr = [];
 
 			if(wtb.length>0) {
@@ -93,10 +93,10 @@ module.exports = {
 					
 					// Check if it's fine... 
 					if(elapsed < (60 * 60 * 24 * days)) {
-						console.log("ots | Order number "+arr["orderid"]+" is still fine");
+						console.log("ots | WTB: Order number "+arr["orderid"]+" is still fine");
 						wtb_arr.push(arr);
 					} else {
-						console.log("ots | Order number "+arr["orderid"]+" is has expired");
+						console.log("ots | WTB: Order number "+arr["orderid"]+" has expired");
 					}
 				});
 			}
@@ -119,7 +119,7 @@ module.exports = {
 
 		// Check if there's characters...
 		if(!btc || !qrl) {
-			message.channel.send("otc wts [btc/qrl] [qrl]")
+			message.channel.send("otc wts [usd/qrl] [qrl]")
 			return;
 		}
 
@@ -185,7 +185,7 @@ module.exports = {
 		}
 
 		if(!btc || !qrl) {
-			message.channel.send("otc wtb [btc/qrl] [qrl]")
+			message.channel.send("otc wtb [usd/qrl] [qrl]")
 			return;
 		}
 	    if(!/^[0-9\.]+$/.test(btc) || !/^[0-9\.]+$/.test(qrl)) {
@@ -319,10 +319,10 @@ module.exports = {
 					if(pref==undefined) { pref = "BTC" }
 					total= btc * qrl;
 					output_in += order.padStart(3," ")+" ";
-					output_in += String("[Trade:"+pref+"] ");
-					output_in += btc.toFixed(8)+' btc/qrl';
-					output_in += String(arr.qrl).padStart(7," ")+" qrl ";
-					output_in += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
+					output_in += String("[P:"+pref+"] ");
+					output_in += btc.toFixed(2)+' USD/QRL x';
+					output_in += String(arr.qrl).padStart(7," ")+" QRL =";
+					output_in += String(total.toFixed(2)).padStart(8," ")+" USD "+arr.username+" ";
 					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
 				
 					output_arr.push(output_in);
@@ -351,10 +351,10 @@ module.exports = {
 					if(pref==undefined) { pref = "BTC" }
 					total= btc * qrl;
 					output_in += order.padStart(3," ")+" ";
-					output_in += String("[Trade:"+pref+"] ");
-					output_in += btc.toFixed(8)+' btc/qrl';
-					output_in += String(arr.qrl).padStart(7," ")+" qrl ";
-					output_in += String(total.toFixed(8)).padStart(12," ")+" BTC "+arr.username+" ";
+					output_in += String("[P:"+pref+"] ");
+					output_in += btc.toFixed(2)+' USD/QRL x';
+					output_in += String(arr.qrl).padStart(7," ")+" QRL =";
+					output_in += String(total.toFixed(2)).padStart(8," ")+" USD "+arr.username+" ";
 					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
 
 					output_arr.push(output_in);
@@ -400,7 +400,7 @@ module.exports = {
 				this.clearall(message, command);
 			break;
 			default:
-				message.channel.send("**Look at the market**\n`otc market`\n\n**Set a WTS (Want to Sell) order**\n`otc wts [btc/qrl] [qrl] [preference]`\n\n**Set a WTB (Want to Buy) order**\n`otc wtb [btc/qrl] [qrl] [preference]`\n\n**Remove an order**\n`otc clear [order number]`")
+				message.channel.send("**Look at the market**\n`otc market`\n\n**Set a WTS (Want to Sell) order**\n`otc wts [usd/qrl] [qrl] [preference]`\n\n**Set a WTB (Want to Buy) order**\n`otc wtb [usd/qrl] [qrl] [preference]`\n\n**Remove an order**\n`otc clear [order number]`")
 
 		}
 
