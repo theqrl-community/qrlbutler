@@ -154,7 +154,7 @@ module.exports = {
 
 		};
 
-		message.channel.send("Market WTS order at "+btc+" for "+qrl+" QRL for a total of ("+total+" BTC) with a preference of: "+pref);
+		message.channel.send("Market WTS order at "+btc+" for "+qrl+" QRL for a total of ("+total.toFixed(2)+" USD) with a preference of: "+pref);
 
 		// Get orderid
 		db.push('/orderid[]',{});
@@ -221,7 +221,7 @@ module.exports = {
 		};
 
 
-		message.channel.send("Market WTB order at "+btc+" for "+qrl+" QRL for a total of ("+total+" BTC) with a preference of: "+pref);
+		message.channel.send("Market WTB order at "+btc+" for "+qrl+" QRL for a total of ("+total.toFixed(2)+" USD) with a preference of: "+pref);
 	
 			// Get orderid
 		db.push('/orderid[]',{});
@@ -322,7 +322,7 @@ module.exports = {
 					output_in += String("[P:"+pref+"] ");
 					output_in += btc.toFixed(2)+' USD/QRL x';
 					output_in += String(arr.qrl).padStart(7," ")+" QRL =";
-					output_in += String(total.toFixed(2)).padStart(8," ")+" USD "+arr.username+" ";
+					output_in += String(total.toFixed(2)).padStart(9," ")+" USD "+arr.username+" ";
 					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
 				
 					output_arr.push(output_in);
@@ -354,7 +354,7 @@ module.exports = {
 					output_in += String("[P:"+pref+"] ");
 					output_in += btc.toFixed(2)+' USD/QRL x';
 					output_in += String(arr.qrl).padStart(7," ")+" QRL =";
-					output_in += String(total.toFixed(2)).padStart(8," ")+" USD "+arr.username+" ";
+					output_in += String(total.toFixed(2)).padStart(9," ")+" USD "+arr.username+" ";
 					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
 
 					output_arr.push(output_in);
