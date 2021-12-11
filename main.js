@@ -1,9 +1,13 @@
 const fs = require('fs');
 const sr = require('sync-request');
 
+// In memory database....
+
+
 const Discord = require('discord.js');
 const client = new Discord.Client({
-    fetchAllMembers:true
+    fetchAllMembers:false,
+    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 client.commands = new Discord.Collection();
 
@@ -21,6 +25,8 @@ if(!fs.existsSync('./env.json')) {
     console.log("env.json is missing.");
     return;
 }
+
+var rate_limit = [];
 
 // Load configuration
 var global_config = require('./env.json')['config'];
@@ -76,6 +82,15 @@ console.log("Prefix's to look for: "+prefix);
 console.log("Omnipresent modules loaded: "+omnipresent_modules.join(', '));
 console.log("Functions available: "+available_commands.join(', '));
 
+for (var i = 0; i < omnipresent_modules.length; i++) {
+    omnipresent = client.commands.get(omnipresent_modules[i]);
+    
+    if(typeof omnipresent.load !== 'undefined' && typeof omnipresent.load == 'function') {
+        console.log("Loading omnipresent module: "+omnipresent_modules[i]);
+        omnipresent.load();
+    }
+}
+
 
 client.on('ready', () => {
     console.log("Ready to serve");
@@ -94,8 +109,26 @@ client.on('ready', () => {
 
 
 
+var rl = [];
+
 client.on('message', message => {
-    console.log("["+moment().format()+"] "+message.author.username+": "+message.content);
+
+    let rl_timespan = 30 * 1000;   // Timespan: In seconds...
+    let rl_joins = 10;
+
+    // Push to array...
+    rl.push(Date.now());
+    console.log(rl);
+
+    // Get number of new joins in the last 10 seconds...
+    ratelimit_length = rl.filter(function(item) {
+        return item > Date.now() - rl_timespan;
+    }).length;
+
+    console.log("[INFO] Current rate limit: "+ratelimit_length);
+
+
+    console.log(message.author.username+": "+message.content);
 
     // Don't respond to other bots.
     if(message.author.bot) return;
@@ -103,17 +136,11 @@ client.on('message', message => {
     // Get member
     var member=message.author;
 
-    // Don't allow direct messages (potential for abuse)
+    // Don't allow direct messages
     if(message.channel.type == 'dm') {
         message.channel.send("Sorry, no direct messages are allowed");
         return;
     }
-
-
-    if (Date.now() - message.author.createdAt < 1000*60*60*24*30) {
-      console.log('User joined in the last 30 days'+message.author.createdAt);
-    }
-
 
     var command = false;
     
@@ -169,11 +196,75 @@ client.on('message', message => {
 
 
 client.on("guildMemberAdd", member => {
-	console.log("!!! GuildMemberAdd: "+member.user.username+' account creation date '+member.user.createdAt);
+	console.log("[INFO] GuildMemberAdd: "+member.user.username+' account creation date '+member.user.createdAt);
 
- //    // Don't know the role id?
-    // const role = member.guild.roles.find(role => role.name === 'probation');
- //    //member.addRole(role);
+    let rl_timespan = 10;   // Timespan: In seconds...
+    let rl_joins = 10;
+
+    // Check if user joined date is less than 7 days...
+    if (Date.now() - member.user.createdAt < 1000*60*60*24*7) {
+        console.log('[WARNING] User joined in the last 7 days: '+member.user.createdAt);
+
+        // Push to array...
+        rate_limit.push(Date.now());
+    
+        console.log(rate_limit);
+    }
+
+    // Get number of new joins in the last 10 seconds...
+    ratelimit_length = rate_limit.filter(function(item) {
+        return item > Date.now() - rl_timespan;
+    }).length;
+
+    console.log("[INFO] Current rate limit: "+ratelimit_length);
+
+    if(ratelimit_length > rl_joins) {
+        console.log("[INFO][TEST] Banning "+member.user.username);
+    }
+});
+
+client.on("messageReactionAdd", async (reaction, user) => {
+    if (reaction.partial) {
+		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			// Return as `reaction.message.author` may be undefined/null
+			return;
+		}
+	}
+    // Run through each module that gets executed for each message
+    for (var i = 0; i < omnipresent_modules.length; i++) {
+        omnipresent = client.commands.get(omnipresent_modules[i]);
+        
+        if(typeof omnipresent.runMessageReactionAdd !== 'undefined' && typeof omnipresent.runMessageReactionAdd == 'function') {
+            console.log("Executing omnipresent module: "+omnipresent_modules[i]);
+            omnipresent.runMessageReactionAdd(reaction, functions[omnipresent_modules[i]]['config']);
+        }
+    }
+});
+
+client.on("messageReactionRemove", async (reaction, user) => {
+    if (reaction.partial) {
+		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			// Return as `reaction.message.author` may be undefined/null
+			return;
+		}
+	}
+    // Run through each module that gets executed for each message
+    for (var i = 0; i < omnipresent_modules.length; i++) {
+        omnipresent = client.commands.get(omnipresent_modules[i]);
+        
+        if(typeof omnipresent.runMessageReactionRemove !== 'undefined' && typeof omnipresent.runMessageReactionRemove == 'function') {
+            console.log("Executing omnipresent module: "+omnipresent_modules[i]);
+            omnipresent.runMessageReactionRemove(reaction, functions[omnipresent_modules[i]]['config']);
+        }
+    }
 });
 
 console.log("Logging in with "+process.argv[2]+" token: ..."+config['token'].slice(-10));

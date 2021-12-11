@@ -11,6 +11,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@google-cloud/translate": "*",
+		"@mapbox/node-pre-gyp": "^1.0.5",
 		"bufferutil": "*",
 		"discord.js": "*",
 		"download": "*",
@@ -24,6 +25,8 @@
 		"request": "*",
 		"request-promise": "*",
 		"sodium": "*",
+		"sqlite": "^4.0.23",
+		"sqlite3": "^5.0.0",
 		"sync-request": "*",
 		"uws": "*",
 		"zlib-sync": "*"
