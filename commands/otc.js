@@ -131,11 +131,11 @@ module.exports = {
 		btc = parseFloat(btc);
 		qrl = parseFloat(qrl);
 
-		if(btc>1 || btc <= 0.000000001) {
-			message.channel.send("BTC price per QRL is either too high or too low. Range 0.00000001 - 1");
+		if(btc>1000000 || btc <= 0.001) {
+			message.channel.send("USD price per QRL is either too high or too low. Range is $0.001 - $1,000,000");
 			return;
 		}
-		if(qrl<=1) {
+		if(qrl<1) {
 			message.channel.send("Can't sell less than 1 QRL at a time");
 			return;
 		}
@@ -154,7 +154,7 @@ module.exports = {
 
 		};
 
-		message.channel.send("Market WTS order at "+btc+" for "+qrl+" QRL for a total of ("+total.toFixed(2)+" USD) with a preference of: "+pref);
+		message.channel.send("Market WTS order at "+btc+" for "+qrl+" QRL for a total of ($"+total.toFixed(2)+" USD) with a preference of: "+pref);
 
 		// Get orderid
 		db.push('/orderid[]',{});
@@ -197,11 +197,11 @@ module.exports = {
 		qrl = parseFloat(qrl);
 
 		// check if there's characters...
-		if(btc>1 || btc <= 0.000000001) {
-			message.channel.send("BTC price per QRL is either too high or too low. Range 0.00000001 - 1");
+		if(btc>1000000 || btc <= 0.001) {
+			message.channel.send("USD price per QRL is either too high or too low. Range is $0.001 - $1,000,000");
 			return;
 		}
-		if(qrl<=1) {
+		if(qrl<1) {
 			message.channel.send("Can't buy less than 1 QRL at a time");
 			return;
 		}
@@ -221,7 +221,7 @@ module.exports = {
 		};
 
 
-		message.channel.send("Market WTB order at "+btc+" for "+qrl+" QRL for a total of ("+total.toFixed(2)+" USD) with a preference of: "+pref);
+		message.channel.send("Market WTB order at "+btc+" for "+qrl+" QRL for a total of ($"+total.toFixed(2)+" USD) with a preference trading pair of: "+pref);
 	
 			// Get orderid
 		db.push('/orderid[]',{});
@@ -322,7 +322,7 @@ module.exports = {
 					output_in += String("[P:"+pref+"] ");
 					output_in += btc.toFixed(2)+' USD/QRL x';
 					output_in += String(arr.qrl).padStart(7," ")+" QRL =";
-					output_in += String(total.toFixed(2)).padStart(9," ")+" USD "+arr.username+" ";
+					output_in += String(total.toFixed(2)).padStart(8," ")+" USD "+arr.username+" ";
 					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
 				
 					output_arr.push(output_in);
@@ -354,7 +354,7 @@ module.exports = {
 					output_in += String("[P:"+pref+"] ");
 					output_in += btc.toFixed(2)+' USD/QRL x';
 					output_in += String(arr.qrl).padStart(7," ")+" QRL =";
-					output_in += String(total.toFixed(2)).padStart(9," ")+" USD "+arr.username+" ";
+					output_in += String(total.toFixed(2)).padStart(8," ")+" USD "+arr.username+" ";
 					output_in += String(timeDifference(Date.now(),arr.datenow))+"\n";
 
 					output_arr.push(output_in);
