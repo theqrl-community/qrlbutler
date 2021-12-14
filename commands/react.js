@@ -1,6 +1,7 @@
 const sqlite = require('sqlite');
 const sqlite3 = require('sqlite3');
 const {open} = require('sqlite');
+const { ExecutionContext } = require('puppeteer-core');
 
 async function DB () {
     return open({
@@ -13,6 +14,34 @@ module.exports = {
     load: async function() {
         this.db = await DB();
         await this.db.migrate({force : 'last'});
+    },
+    verifyReaction: function(reaction, user) {
+        // default pass
+        var pass = true;
+
+        // Check if person is a bot.
+        if(reaction.message.author.bot === true) {
+            console.log("INFO: Reaction recipient is a bot");
+            pass = false;
+        }
+
+        if(user.bot === true) {
+            console.log("INFO: Reaction facilitator is a bot");
+            pass = false;
+        }
+
+        // Check if user is the same user
+        if(reaction.message.author.id == user.id) {
+            console.log("INFO: Reaction facilitator is the same as the recipient");
+            pass = false;
+        }
+
+        if(!reaction.message.channel.name.startsWith('hackathon')) {
+            console.log("INFO: Wrong message channel");
+            pass = false;
+        }
+
+        return pass;
     },
 	run:async function(message, command, config) {
         command = message.content.toLowerCase().split(' ');
@@ -30,13 +59,27 @@ module.exports = {
             break;
 		}
 	},
-    runMessageReactionRemove:async function(reaction, config) {
+    runMessageReactionRemove:async function(reaction, user, config) {
+        if(!this.verifyReaction(reaction, user)) {
+            console.log("INFO: Verify reaction not satisfied");
+            
+            return;
+        }
+
         let emoji = `${reaction.emoji}`;
         let author = reaction.message.author;
     
         await this.addToScore(emoji, author, -1);
     },
-    runMessageReactionAdd:async function(reaction, config) {
+    runMessageReactionAdd:async function(reaction, user, config) {
+        if(!this.verifyReaction(reaction, user)) {
+            console.log("Verify reaction not satisfied");
+            
+            return;
+        }
+        
+
+        
         let emoji = `${reaction.emoji}`;
         let author = reaction.message.author;
         
