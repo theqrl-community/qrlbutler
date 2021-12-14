@@ -240,7 +240,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
         
         if(typeof omnipresent.runMessageReactionAdd !== 'undefined' && typeof omnipresent.runMessageReactionAdd == 'function') {
             console.log("Executing omnipresent module: "+omnipresent_modules[i]);
-            omnipresent.runMessageReactionAdd(reaction, functions[omnipresent_modules[i]]['config']);
+            omnipresent.runMessageReactionAdd(reaction, user, functions[omnipresent_modules[i]]['config']);
         }
     }
 });
@@ -262,7 +262,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
         
         if(typeof omnipresent.runMessageReactionRemove !== 'undefined' && typeof omnipresent.runMessageReactionRemove == 'function') {
             console.log("Executing omnipresent module: "+omnipresent_modules[i]);
-            omnipresent.runMessageReactionRemove(reaction, functions[omnipresent_modules[i]]['config']);
+            omnipresent.runMessageReactionRemove(reaction, user, functions[omnipresent_modules[i]]['config']);
         }
     }
 });
