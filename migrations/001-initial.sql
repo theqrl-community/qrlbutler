@@ -2,15 +2,17 @@
 -- Up
 --------------------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS Score (
+CREATE TABLE IF NOT EXISTS score (
   emoji TEXT,
-  userId TEXT,
-  username TEXT NOT NULL,
-  points INTEGER NOT NULL,
-  PRIMARY KEY(emoji, userId)
+  messageid TEXT,
+  r_userid TEXT,
+  r_username TEXT,
+  f_userid TEXT,
+  reactdate INTEGER,
+  PRIMARY KEY(emoji, messageid, f_userid)
 );
 
-CREATE TABLE IF NOT EXISTS Setting (
+CREATE TABLE IF NOT EXISTS setting (
   setting TEXT PRIMARY KEY,
   value TEXT
 );
