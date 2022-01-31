@@ -118,17 +118,17 @@ client.on('message', message => {
 
     // Push to array...
     rl.push(Date.now());
-    console.log(rl);
+    // console.log(rl);
 
     // Get number of new joins in the last 10 seconds...
     ratelimit_length = rl.filter(function(item) {
         return item > Date.now() - rl_timespan;
     }).length;
 
-    console.log("[INFO] Current rate limit: "+ratelimit_length);
+    // console.log("[INFO] Current rate limit: "+ratelimit_length);
 
 
-    console.log(message.author.username+": "+message.content);
+    console.log("[INFO][MESSAGE] "+message.author.username+": "+message.content);
 
     // Don't respond to other bots.
     if(message.author.bot) return;
@@ -143,7 +143,46 @@ client.on('message', message => {
     }
 
     var command = false;
-    
+
+    if(message.content.startsWith('!kicknew')) {
+       if(message.member.hasPermission("BAN_MEMBERS")) {
+               let members = (message.guild.roles.cache.get('853662605621067828').members);
+               var size = 0;
+
+	       // console.log(size);
+               members.forEach(m => {
+                       size++;
+                       // Your kick methodology, i.e. m.kick(), m being the member from the array.
+                       console.log(m.id+":"+m.user.username);
+                       m.kick("Kicked new user");      
+               });
+               
+               message.channel.send("Kicking "+size+" users with 'new' role");
+               
+       } else {
+               message.channel.send("You're not privileged enough.");
+       }
+    }
+    if(message.content.startsWith('!bannew')) {
+        if(message.member.hasPermission("BAN_MEMBERS")) {
+                let members = (message.guild.roles.cache.get('853662605621067828').members);
+                var size = 0;
+
+		// console.log(size);
+                members.forEach(m => {
+                        size++;
+                        // Your kick methodology, i.e. m.kick(), m being the member from the array.
+                        console.log(m.id+":"+m.user.username);
+                        m.ban({ days: 3, reason:"New member bot spam"});
+                });
+
+                message.channel.send("Banning "+size+" users with 'new' role");
+
+        } else {
+                message.channel.send("You're not privileged enough.");
+        }
+    }
+
     // Check if there's a command, then assign command
     if(message.content.startsWithArray(prefix)) {
         command = message.content.toLowerCase().split(' ')[0];
@@ -196,7 +235,7 @@ client.on('message', message => {
 
 
 client.on("guildMemberAdd", member => {
-	console.log("[INFO] GuildMemberAdd: "+member.user.username+' account creation date '+member.user.createdAt);
+    console.log("[INFO] GuildMemberAdd: "+member.user.username+' account creation date '+member.user.createdAt);
 
     let rl_timespan = 10;   // Timespan: In seconds...
     let rl_joins = 10;
@@ -216,10 +255,10 @@ client.on("guildMemberAdd", member => {
         return item > Date.now() - rl_timespan;
     }).length;
 
-    console.log("[INFO] Current rate limit: "+ratelimit_length);
+    // console.log("[INFO] Current rate limit: "+ratelimit_length);
 
     if(ratelimit_length > rl_joins) {
-        console.log("[INFO][TEST] Banning "+member.user.username);
+	// console.log("[INFO][TEST] Banning "+member.user.username);
     }
 });
 
@@ -229,7 +268,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 		try {
 			await reaction.fetch();
 		} catch (error) {
-			console.error('Something went wrong when fetching the message:', error);
+			// console.error('Something went wrong when fetching the message:', error);
 			// Return as `reaction.message.author` may be undefined/null
 			return;
 		}
@@ -251,7 +290,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
 		try {
 			await reaction.fetch();
 		} catch (error) {
-			console.error('Something went wrong when fetching the message:', error);
+			// console.error('Something went wrong when fetching the message:', error);
 			// Return as `reaction.message.author` may be undefined/null
 			return;
 		}
